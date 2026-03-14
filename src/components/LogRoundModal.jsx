@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { B, serif, sans, COURSES } from '../lib/data.js'
+import { B, serif, sans } from '../lib/data.js'
 
 function StarPicker({ value, onChange, color }) {
   return (
@@ -16,9 +16,8 @@ function StarPicker({ value, onChange, color }) {
   )
 }
 
-export default function LogRoundModal({ courseId, onClose, onSuccess }) {
+export default function LogRoundModal({ courseId, courseName, onClose, onSuccess }) {
   const { user } = useAuth()
-  const course = COURSES.find(c => c.id === courseId)
 
   const [score, setScore]           = useState('')
   const [conditions, setConditions] = useState(0)
@@ -75,7 +74,7 @@ export default function LogRoundModal({ courseId, onClose, onSuccess }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
             <h2 style={{ fontFamily: serif, fontSize: 20, fontWeight: 900, color: B.textNavy, margin: '0 0 2px' }}>Log Your Round</h2>
-            <p style={{ fontFamily: sans, fontSize: 13, color: B.textSoft, margin: 0 }}>{course?.name}</p>
+            <p style={{ fontFamily: sans, fontSize: 13, color: B.textSoft, margin: 0 }}>{courseName}</p>
           </div>
           <button onClick={onClose} style={{ background: B.feedBg, border: 'none', borderRadius: '50%', width: 34, height: 34, cursor: 'pointer', fontSize: 16, color: B.textMid }}>✕</button>
         </div>

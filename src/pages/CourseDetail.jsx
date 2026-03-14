@@ -53,7 +53,7 @@ export default function CourseDetail() {
 
   return (
     <div style={{ maxWidth:680, margin:'0 auto' }}>
-      {showModal && <LogRoundModal courseId={course.id} onClose={() => setShowModal(false)} onSuccess={fetchRounds}/>}
+      {showModal && <LogRoundModal courseId={course.id} courseName={course.name} onClose={() => setShowModal(false)} onSuccess={fetchRounds}/>}
 
       <button onClick={() => navigate(-1)} style={{ background:'none', border:'none', color:B.textMid, cursor:'pointer', padding:'0 0 16px', fontSize:13, fontFamily:sans, fontWeight:600, display:'flex', alignItems:'center', gap:6 }}>← Back</button>
 
