@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { B, serif, sans, COURSES } from '../lib/data.js'
+import { B, serif, sans } from '../lib/data.js'
 import { CourseCard, PageBanner } from '../components/UI.jsx'
+import { useCourses } from '../hooks/useCourses.js'
 
 export default function MapPage() {
   const navigate = useNavigate()
+  const { courses, loading } = useCourses()
   const [hov, setHov] = useState(null)
   const [sel, setSel] = useState(null)
   const toX = lng => ((lng+126)/60)*680
@@ -12,13 +14,14 @@ export default function MapPage() {
 
   return (
     <div>
-      <PageBanner icon="🗺️" title="Course Map" subtitle={`${COURSES.length} rated courses — tap any pin to explore`} bg={B.navy}/>
+      <PageBanner icon="🗺️" title="Course Map" subtitle={`${courses.length} rated courses — tap any pin to explore`} bg={B.navy}/>
+
       <div style={{ background:'#fff', borderRadius:16, overflow:'hidden', border:`1px solid ${B.border}`, marginBottom:18 }}>
         <div style={{ position:'relative', background:'#d8ead8', height:340 }}>
           <svg width="100%" height="100%" viewBox="0 0 680 380">
             <rect width="680" height="380" fill="#daeada"/>
             <text x="340" y="210" textAnchor="middle" fill="rgba(30,69,48,0.07)" fontSize="90" fontWeight="900" fontFamily="Georgia,serif">USA</text>
-            {COURSES.map(c => {
+            {!loading && courses.map(c => {
               const x=toX(c.lng), y=toY(c.lat)
               const s=sel?.id===c.id, h=hov?.id===c.id
               return (
@@ -45,16 +48,24 @@ export default function MapPage() {
           <span style={{ fontSize:12, color:B.textSoft, fontFamily:sans }}>Number = national rank</span>
         </div>
       </div>
+
       {sel && (
         <div style={{ marginBottom:16 }}>
           <div style={{ fontSize:11, fontWeight:600, color:B.textSoft, fontFamily:sans, marginBottom:8, textTransform:'uppercase', letterSpacing:'0.06em' }}>Selected</div>
           <CourseCard course={sel} onClick={c => navigate(`/course/${c.id}`)} row/>
         </div>
       )}
+
       <div style={{ fontSize:11, fontWeight:600, color:B.textSoft, fontFamily:sans, marginBottom:10, textTransform:'uppercase', letterSpacing:'0.06em' }}>All Courses</div>
-      <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-        {COURSES.map(c => <CourseCard key={c.id} course={c} onClick={c => navigate(`/course/${c.id}`)} row/>)}
-      </div>
+      {loading ? (
+        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+          {[...Array(5)].map((_,i) => <div key={i} style={{ background:'#fff', borderRadius:12, height:64, border:`1px solid ${B.border}`, opacity:0.5 }}/>)}
+        </div>
+      ) : (
+        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+          {courses.map(c => <CourseCard key={c.id} course={c} onClick={c => navigate(`/course/${c.id}`)} row/>)}
+        </div>
+      )}
     </div>
   )
 }

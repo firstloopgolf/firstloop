@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { B, serif, sans, COURSES } from '../lib/data.js'
+import { B, serif, sans } from '../lib/data.js'
 import { Pill, CourseCard } from '../components/UI.jsx'
+import { useCourses } from '../hooks/useCourses.js'
 
 export default function Discover() {
   const navigate = useNavigate()
+  const { courses, loading } = useCourses()
   const [q, setQ] = useState('')
   const [f, setF] = useState('all')
 
-  const list = COURSES.filter(c => {
+  const list = courses.filter(c => {
     const match = !q || c.name.toLowerCase().includes(q.toLowerCase()) || c.location.toLowerCase().includes(q.toLowerCase()) || c.state.toLowerCase().includes(q.toLowerCase())
     const fm = f==='all' || (f==='top100' && c.natRank<=100) || (f==='value' && c.value>=8.5) || (f==='public' && c.price.length<=2)
     return match && fm
@@ -56,11 +58,19 @@ export default function Discover() {
         {q ? `Results (${list.length})` : 'Featured Courses'}
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(270px,1fr))', gap:16 }}>
-        {list.map(c => (
-          <CourseCard key={c.id} course={c} onClick={c => navigate(`/course/${c.id}`)}/>
-        ))}
-      </div>
+      {loading ? (
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(270px,1fr))', gap:16 }}>
+          {[...Array(6)].map((_,i) => (
+            <div key={i} style={{ background:B.white, borderRadius:16, height:280, border:`1px solid ${B.border}`, opacity:0.5 }}/>
+          ))}
+        </div>
+      ) : (
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(270px,1fr))', gap:16 }}>
+          {list.map(c => (
+            <CourseCard key={c.id} course={c} onClick={c => navigate(`/course/${c.id}`)}/>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
