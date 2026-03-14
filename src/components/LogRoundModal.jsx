@@ -181,4 +181,124 @@ export default function LogRoundModal({ courseId, courseName, onClose, onSuccess
                 <p style={{ fontFamily:sans, fontSize:13, color:B.textSoft, margin:0 }}>{courseName}</p>
               </div>
               <button onClick={onClose}
-                style={{ background:B.feedBg, border:
+                style={{ background:B.feedBg, border:'none', borderRadius:'50%', width:34, height:34, cursor:'pointer', fontSize:16, color:B.textMid, flexShrink:0 }}>
+                ✕
+              </button>
+            </div>
+
+            {error && (
+              <div style={{ background:'#fde8e8', color:'#c00', borderRadius:8, padding:'10px 14px', fontSize:13, fontFamily:sans, marginBottom:16 }}>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+
+              {/* Score + Date row */}
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:22 }}>
+                <div>
+                  <label style={{ fontSize:11, fontWeight:700, color:B.textMid, fontFamily:sans, display:'block', marginBottom:6, textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                    Score
+                  </label>
+                  <input
+                    value={score}
+                    onChange={e => setScore(e.target.value)}
+                    placeholder="e.g. 84"
+                    type="number" min="50" max="150"
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize:11, fontWeight:700, color:B.textMid, fontFamily:sans, display:'block', marginBottom:6, textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                    Date Played
+                  </label>
+                  <input
+                    value={playedAt}
+                    onChange={e => setPlayedAt(e.target.value)}
+                    type="date"
+                    style={inputStyle}
+                  />
+                </div>
+              </div>
+
+              {/* Half-star rating pickers */}
+              <div style={{ display:'flex', flexDirection:'column', gap:18, marginBottom:20 }}>
+                {[
+                  ['⛺ Course Conditions', conditions, setConditions, B.green],
+                  ['💰 Value for Money',   value,      setValue,      B.navy],
+                  ['🏌️ Facilities & Vibes', vibes,    setVibes,      B.gold],
+                ].map(([label, val, setter, color]) => (
+                  <div key={label}>
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+                      <label style={{ fontSize:13, fontWeight:600, color:B.textNavy, fontFamily:sans }}>{label}</label>
+                      <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                        {val > 0 && (
+                          <>
+                            <span style={{ fontSize:15, fontWeight:800, color, fontFamily:serif }}>{val}.0</span>
+                            <span style={{ fontSize:11, color:B.textSoft, fontFamily:sans }}>· {ratingLabel(val)}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <HalfStarPicker value={val} onChange={setter} color={color}/>
+                    {/* Rating scale labels */}
+                    <div style={{ display:'flex', justifyContent:'space-between', marginTop:4 }}>
+                      <span style={{ fontSize:10, color:B.textSoft, fontFamily:sans }}>Poor</span>
+                      <span style={{ fontSize:10, color:B.textSoft, fontFamily:sans }}>World Class</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Overall preview */}
+              {overall && (
+                <div style={{ background:B.feedBg, borderRadius:12, padding:'14px 18px', marginBottom:18, border:`1px solid ${B.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                  <div>
+                    <div style={{ fontSize:12, fontWeight:600, color:B.textMid, fontFamily:sans, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:2 }}>Overall Rating</div>
+                    <div style={{ fontSize:11, color:B.textSoft, fontFamily:sans }}>Average of all three scores</div>
+                  </div>
+                  <div style={{ textAlign:'right' }}>
+                    <div style={{ fontSize:32, fontWeight:900, color:B.gold, fontFamily:serif, lineHeight:1 }}>{overall}</div>
+                    <div style={{ fontSize:11, color:B.textSoft, fontFamily:sans }}>{ratingLabel(parseFloat(overall))}</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Comment */}
+              <div style={{ marginBottom:22 }}>
+                <label style={{ fontSize:11, fontWeight:700, color:B.textMid, fontFamily:sans, display:'block', marginBottom:6, textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                  Review <span style={{ fontWeight:400, textTransform:'none', letterSpacing:0 }}>(optional)</span>
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={e => setComment(e.target.value)}
+                  placeholder="How was the round? Any standout holes? Would you recommend it?"
+                  rows={3}
+                  style={{ ...inputStyle, resize:'vertical', lineHeight:1.6 }}
+                />
+                <div style={{ textAlign:'right', marginTop:4 }}>
+                  <span style={{ fontSize:11, color: comment.length > 280 ? '#c00' : B.textSoft, fontFamily:sans }}>{comment.length}/300</span>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || !conditions || !value || !vibes}
+                style={{
+                  width:'100%',
+                  background: (!conditions || !value || !vibes) ? B.border : loading ? B.border : B.gold,
+                  color:B.navy, border:'none', borderRadius:12, padding:'15px 0',
+                  fontWeight:800, fontSize:15, cursor: (!conditions || !value || !vibes) ? 'not-allowed' : loading ? 'not-allowed' : 'pointer',
+                  fontFamily:serif, transition:'all 0.15s',
+                }}
+              >
+                {loading ? 'Saving...' : !conditions || !value || !vibes ? 'Rate all 3 categories to continue' : 'Save Round ⛳'}
+              </button>
+
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
