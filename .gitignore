@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Course data files - keeping local only
+data/
+
+# Scripts contain Supabase service key - never push to GitHub
+scripts/
