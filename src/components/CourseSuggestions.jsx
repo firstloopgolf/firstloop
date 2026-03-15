@@ -3,16 +3,38 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { B, serif, sans } from '../lib/data.js'
-import { CourseCard } from './UI.jsx'
+
+function normalizeCourse(c) {
+  return {
+    id:         c.id,
+    name:       c.name,
+    location:   c.location,
+    state:      c.state,
+    par:        c.par,
+    holes:      c.holes,
+    price:      c.price,
+    rating:     c.rating       || 0,
+    conditions: c.conditions   || 0,
+    value:      c.value_rating || 0,
+    vibes:      c.vibes        || 0,
+    reviews:    c.review_count || 0,
+    natRank:    c.nat_rank     || 999,
+    stRank:     c.st_rank      || 999,
+    icon:       c.icon         || '⛳',
+    bg:         c.bg_color     || B.navy,
+  }
+}
 
 export default function CourseSuggestions() {
-  const navigate        = useNavigate()
-  const { user }        = useAuth()
+  const navigate              = useNavigate()
+  const { user }              = useAuth()
   const [suggestions, setSuggestions] = useState([])
-  const [loading, setLoading]         = useState(true)
-  const [reason, setReason]           = useState('')
+  const [loading, setLoading] = useState(true)
+  const [reason, setReason]   = useState('')
 
-  useEffect(() => { if (user) fetchSuggestions() }, [user])
+  useEffect(() => {
+    fetchSuggestions()
+  }, [user])
 
   async function fetchSuggestions() {
     setLoading(true)
@@ -21,147 +43,99 @@ export default function CourseSuggestions() {
       const { data: myRounds } = await supabase
         .from('rounds')
         .select('course_id, overall_rating, conditions_rating, value_rating, vibes_rating')
-        .eq('user_id', user.id)
+        .eq('user_id', user?.id || '')
         .order('overall_rating', { ascending: false })
 
-      if (!myRounds || myRounds.length === 0) {
-        // New user — show top rated courses
-        const { data: top } = await supabase
-            .from('courses')
-            .select('*')
-            .order('rating', { ascending: false })
-            .limit(6)
-        setSuggestions((top || []).map(normalizeCourse))
-        setReason('Top rated courses to get you started')
-        setLoading(false)
-        return
-      }
+      const playedIds = (myRounds || []).map(r => r.course_id)
 
-      const playedIds = myRounds.map(r => r.course_id)
-
-      // Calculate what the user values most
-      const avgConditions = avg(myRounds.map(r => r.conditions_rating).filter(Boolean))
-      const avgValue      = avg(myRounds.map(r => r.value_rating).filter(Boolean))
-      const avgVibes      = avg(myRounds.map(r => r.vibes_rating).filter(Boolean))
-
-      // Find what they rate highest
-      const topPriority = avgConditions >= avgVibes && avgConditions >= avgValue
-        ? 'conditions'
-        : avgVibes >= avgValue ? 'vibes' : 'value_rating'
-
-      const labels = { conditions:'course conditions', vibes:'facilities & atmosphere', value_rating:'value for money' }
-
-      // Get their top rated course to match state
-      const topRound = myRounds[0]
-      const { data: topCourse } = await supabase
-        .from('courses')
-        .select('state')
-        .eq('id', topRound.course_id)
-        .single()
-
-      // Find similar courses they haven't played
+      // Build query — exclude already played courses
       let query = supabase
-            .from('courses')
-            .select('*')
-            .not('id', 'in', `(${playedIds.join(',')})`)
+        .from('courses')
+        .select('*')
+        .order('rating', { ascending: false })
+        .limit(6)
 
-      // Weight by what they care about most
-      if (topPriority === 'conditions') {
-        query = query.order('conditions', { ascending: false })
-      } else if (topPriority === 'vibes') {
-        query = query.order('vibes', { ascending: false })
-      } else {
-        query = query.order('value_rating', { ascending: false })
+      if (playedIds.length > 0) {
+        query = query.not('id', 'in', `(${playedIds.join(',')})`)
       }
 
-      const { data: candidates } = await query.limit(20)
+      const { data: candidates } = await query
 
-        if (!candidates || candidates.length === 0) {
-        // Fall back to top rated
-        const { data: fallback } = await supabase
-            .from('courses')
-            .select('*')
-            .not('id', 'in', `(${playedIds.join(',')})`)
-            .order('rating', { ascending: false })
-            .limit(6)
-        setSuggestions((fallback || []).map(normalizeCourse))
-        setReason('Top rated courses you haven\'t played yet')
+      if (!candidates || candidates.length === 0) {
         setLoading(false)
         return
+      }
+
+      // If user has rounds, personalize — otherwise show top rated
+      if (myRounds && myRounds.length > 0) {
+        const avg = arr => arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : 0
+        const avgC = avg(myRounds.map(r => r.conditions_rating).filter(Boolean))
+        const avgV = avg(myRounds.map(r => r.value_rating).filter(Boolean))
+        const avgF = avg(myRounds.map(r => r.vibes_rating).filter(Boolean))
+
+        const topPriority = avgC >= avgF && avgC >= avgV ? 'conditions'
+          : avgF >= avgV ? 'vibes' : 'value'
+
+        const labels = {
+          conditions: 'your love of great course conditions',
+          vibes:      'your appreciation for facilities',
+          value:      'your focus on value for money',
         }
 
-      // Score each candidate
-      const scored = candidates.map(c => {
-        let score = 0
-        // Prefer same state
-        if (c.state === topCourse?.state) score += 2
-        // Weight by user's top priority
-        if (topPriority === 'conditions') score += (c.conditions || 0) * 0.5
-        if (topPriority === 'vibes')      score += (c.vibes || 0) * 0.5
-        if (topPriority === 'value_rating') score += (c.value_rating || 0) * 0.5
-        // Overall rating always matters
-        score += (c.rating || 0) * 0.3
-        return { ...c, _score: score }
-      })
+        const scored = candidates.map(c => {
+          let score = (c.rating || 0) * 0.4
+          if (topPriority === 'conditions') score += (c.conditions || 0) * 0.6
+          if (topPriority === 'vibes')      score += (c.vibes || 0) * 0.6
+          if (topPriority === 'value')      score += (c.value_rating || 0) * 0.6
+          return { ...c, _score: score }
+        })
 
-      scored.sort((a, b) => b._score - a._score)
-      setSuggestions(scored.slice(0, 6).map(normalizeCourse))
-      setReason(`Based on your love of ${labels[topPriority]}`)
+        scored.sort((a, b) => b._score - a._score)
+        setSuggestions(scored.slice(0, 6).map(normalizeCourse))
+        setReason(`Suggested based on ${labels[topPriority]}`)
+      } else {
+        setSuggestions(candidates.map(normalizeCourse))
+        setReason('Top rated courses to get you started')
+      }
 
     } catch (err) {
-      console.error('Suggestions error:', err)
+      console.error('CourseSuggestions error:', err)
     } finally {
       setLoading(false)
-    }
-  }
-
-  function avg(arr) {
-    if (!arr.length) return 0
-    return arr.reduce((a, b) => a + b, 0) / arr.length
-  }
-
-  function normalizeCourse(c) {
-    return {
-      id:         c.id,
-      name:       c.name,
-      location:   c.location,
-      state:      c.state,
-      par:        c.par,
-      holes:      c.holes,
-      price:      c.price,
-      lat:        c.lat,
-      lng:        c.lng,
-      desc:       c.description,
-      rating:     c.rating     || 0,
-      conditions: c.conditions || 0,
-      value:      c.value_rating || 0,
-      vibes:      c.vibes      || 0,
-      reviews:    c.review_count || 0,
-      natRank:    c.nat_rank   || 999,
-      stRank:     c.st_rank    || 999,
-      icon:       c.icon       || '⛳',
-      bg:         c.bg_color   || B.navy,
     }
   }
 
   if (loading || suggestions.length === 0) return null
 
   return (
-    <div style={{ marginTop:32 }}>
-      {/* Header */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14 }}>
-        <div>
-          <h2 style={{ fontSize:18, fontWeight:800, color:B.textNavy, fontFamily:serif, margin:'0 0 3px' }}>
-            🎯 Suggested For You
-          </h2>
-          <p style={{ fontSize:12, color:B.textSoft, fontFamily:sans, margin:0 }}>{reason}</p>
-        </div>
+    <div style={{ marginTop:28 }}>
+      <div style={{ marginBottom:14 }}>
+        <h2 style={{ fontSize:17, fontWeight:800, color:B.textNavy, fontFamily:serif, margin:'0 0 3px' }}>
+          🎯 Suggested For You
+        </h2>
+        <p style={{ fontSize:12, color:B.textSoft, fontFamily:sans, margin:0 }}>{reason}</p>
       </div>
 
-      {/* Course grid */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(270px, 1fr))', gap:16 }}>
+      <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
         {suggestions.map(c => (
-          <CourseCard key={c.id} course={c} onClick={c => navigate(`/course/${c.id}`)}/>
+          <div key={c.id} onClick={() => navigate(`/course/${c.id}`)}
+            style={{ background:'#fff', borderRadius:13, padding:'13px 15px', cursor:'pointer', border:`1px solid ${B.border}`, display:'flex', alignItems:'center', gap:11, transition:'all 0.15s' }}
+            onMouseEnter={e => { e.currentTarget.style.boxShadow='0 4px 16px rgba(27,48,84,0.08)'; e.currentTarget.style.borderColor=B.gold }}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow='none'; e.currentTarget.style.borderColor=B.border }}>
+            <div style={{ width:42, height:42, borderRadius:10, background:c.bg, display:'flex', alignItems:'center', justifyContent:'center', fontSize:19, flexShrink:0 }}>
+              {c.icon}
+            </div>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontSize:13, fontWeight:600, color:B.textNavy, fontFamily:sans, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{c.name}</div>
+              <div style={{ fontSize:12, color:B.textSoft, fontFamily:sans }}>{c.location}</div>
+            </div>
+            <div style={{ textAlign:'right', flexShrink:0 }}>
+              <div style={{ fontSize:16, fontWeight:900, color:B.gold, fontFamily:serif }}>
+                {c.rating > 0 ? c.rating.toFixed(1) : '—'}
+              </div>
+              <div style={{ fontSize:10, color:B.textSoft, fontFamily:sans }}>{c.reviews.toLocaleString()} reviews</div>
+            </div>
+          </div>
         ))}
       </div>
     </div>

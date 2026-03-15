@@ -246,7 +246,7 @@ export default function Discover() {
           ))}
         </div>
       )}
-    </div>
-    {!q && activeFilterCount === 0 && <CourseSuggestions />}
+      {!q && activeFilterCount === 0 && <CourseSuggestions />}
+    </div>  
   )
 }
