@@ -63,4 +63,5 @@ export const NAV_TABS = [
   { id:'rankings', label:'Rankings', icon:'🏆' },
   { id:'map',      label:'Map',      icon:'🗺️'  },
   { id:'profile',  label:'Profile',  icon:'👤' },
+  { id:'submit',   label:'Submit',   icon:'➕' },
 ]

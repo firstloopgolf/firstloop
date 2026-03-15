@@ -4,6 +4,20 @@ import { B, serif, sans } from '../lib/data.js'
 import { PageBanner } from '../components/UI.jsx'
 import { useCourses } from '../hooks/useCourses.js'
 
+function RankBadge({ isLive }) {
+  return (
+    <span style={{
+      fontSize: 9, fontWeight: 700, fontFamily: sans,
+      padding: '2px 7px', borderRadius: 999,
+      background: isLive ? '#e0ede5' : B.goldPale,
+      color: isLive ? B.green : '#8a6010',
+      letterSpacing: '0.04em', whiteSpace: 'nowrap',
+    }}>
+      {isLive ? '⚡ LIVE' : '✦ EDITORIAL'}
+    </span>
+  )
+}
+
 export default function Rankings() {
   const navigate = useNavigate()
   const { courses, loading } = useCourses()
@@ -65,7 +79,10 @@ export default function Rankings() {
                       <div style={{ fontSize:13, fontWeight:600, color:B.textNavy, fontFamily:sans, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{c.name}</div>
                       <div style={{ fontSize:12, color:B.textSoft, fontFamily:sans }}>{c.location}</div>
                     </div>
-                    <div style={{ fontSize:17, fontWeight:900, color:B.gold, fontFamily:serif }}>{c.rating}</div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize:17, fontWeight:900, color:B.gold, fontFamily:serif, marginBottom:2 }}>{c.rating}</div>
+                      <RankBadge isLive={c.isLive}/>
+                    </div>
                   </div>
                 ))}
               </div>

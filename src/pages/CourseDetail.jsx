@@ -6,6 +6,7 @@ import { B, serif, sans } from '../lib/data.js'
 import { Avatar, RatingChip, RatingRow, NatBadge, StatBadge, TabBar } from '../components/UI.jsx'
 import LogRoundModal from '../components/LogRoundModal.jsx'
 import { useCourse } from '../hooks/useCourses.js'
+import ShareRoundModal from '../components/ShareRoundModal.jsx'
 
 export default function CourseDetail() {
   const { id }   = useParams()
@@ -17,6 +18,7 @@ export default function CourseDetail() {
   const [rounds, setRounds]       = useState([])
   const [showModal, setShowModal] = useState(false)
   const [loadingRounds, setLoadingRounds] = useState(true)
+  const [shareRound, setShareRound] = useState(null)
 
   useEffect(() => { if (id) fetchRounds() }, [id])
 
@@ -54,7 +56,7 @@ export default function CourseDetail() {
   return (
     <div style={{ maxWidth:680, margin:'0 auto' }}>
       {showModal && <LogRoundModal courseId={course.id} courseName={course.name} onClose={() => setShowModal(false)} onSuccess={fetchRounds}/>}
-
+      {shareRound && <ShareRoundModal round={shareRound} course={course} onClose={() => setShareRound(null)}/>}
       <button onClick={() => navigate(-1)} style={{ background:'none', border:'none', color:B.textMid, cursor:'pointer', padding:'0 0 16px', fontSize:13, fontFamily:sans, fontWeight:600, display:'flex', alignItems:'center', gap:6 }}>← Back</button>
 
       {/* Hero */}
@@ -112,9 +114,15 @@ export default function CourseDetail() {
                     {round.value_rating      && <RatingRow label="Value"      value={round.value_rating}      color={B.navy}/>}
                     {round.vibes_rating      && <RatingRow label="Facilities"      value={round.vibes_rating}      color={B.gold}/>}
                   </div>
+                 <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                   {round.score && (
                     <span style={{ background:B.feedBg, border:`1px solid ${B.border}`, borderRadius:999, padding:'4px 12px', fontSize:12, fontWeight:700, fontFamily:sans, color:B.textNavy }}>⛳ Score: {round.score}</span>
                   )}
+                  <button onClick={() => setShareRound(round)}
+                    style={{ background:'none', border:`1px solid ${B.border}`, borderRadius:999, padding:'4px 14px', cursor:'pointer', fontSize:12, color:B.textMid, fontFamily:sans, fontWeight:600, display:'flex', alignItems:'center', gap:5 }}>
+                    📤 Share
+                  </button>
+                </div>
                 </div>
               ))}
             </div>

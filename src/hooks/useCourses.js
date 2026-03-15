@@ -53,6 +53,7 @@ function normalizeCourse(c) {
     lat:        c.lat,
     lng:        c.lng,
     desc:       c.description,
+    isLive: c.is_live_ranked || false,
     rating:     c.rating     || 0,
     conditions: c.conditions || 0,
     value:      c.value_rating || 0,

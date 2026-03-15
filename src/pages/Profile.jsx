@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { B, serif, sans, COURSES } from '../lib/data.js'
 import { Pill } from '../components/UI.jsx'
+import ShareRoundModal from '../components/ShareRoundModal.jsx'
 
 export default function Profile() {
   const navigate                    = useNavigate()
@@ -14,6 +15,8 @@ export default function Profile() {
   const [editing, setEditing]       = useState(false)
   const [saving, setSaving]         = useState(false)
   const [saveMsg, setSaveMsg]       = useState('')
+  const [shareRound, setShareRound] = useState(null)
+  const [shareCourse, setShareCourse] = useState(null)
 
   // Edit form state
   const [fullName, setFullName]     = useState('')
@@ -87,6 +90,8 @@ export default function Profile() {
   }
 
   const tabs = [['rounds','My Rounds'],['stats','Stats'],['edit','Edit Profile']]
+
+  {shareRound && <ShareRoundModal round={shareRound} course={shareCourse} onClose={() => { setShareRound(null); setShareCourse(null) }}/>}
 
   return (
     <div>
@@ -200,6 +205,10 @@ export default function Profile() {
                       {r.score        && <div style={{ fontSize:15, fontWeight:800, color:B.textNavy, fontFamily:serif }}>{r.score}</div>}
                       {r.overall_rating && <div style={{ fontSize:12, color:B.gold, fontWeight:700, fontFamily:sans }}>★ {r.overall_rating}</div>}
                     </div>
+                    
+                    <button onClick={e => { e.stopPropagation(); setShareRound(r); setShareCourse({ id: r.course_id, name: r.courses?.name, location: r.courses?.location, bg: c?.bg || B.navy, icon: c?.icon || '⛳' }) }}
+                        style={{ background:'none', border:`1px solid ${B.border}`, borderRadius:999, padding:'4px 10px', cursor:'pointer', fontSize:11, color:B.textMid, fontFamily:sans, fontWeight:600, flexShrink:0 }}> 📤
+                    </button>
                   </div>
                 )
               })}

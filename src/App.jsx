@@ -10,6 +10,7 @@ import Profile      from './pages/Profile.jsx'
 import CourseDetail from './pages/CourseDetail.jsx'
 import Auth         from './pages/Auth.jsx'
 import Landing      from './pages/Landing.jsx'
+import SubmitCourse from './pages/SubmitCourse.jsx'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -70,6 +71,7 @@ export default function App() {
           <Route path="/auth"       element={<Auth />} />
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/profile"    element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/submit" element={<SubmitCourse />} />
         </Routes>
       </div>
 
