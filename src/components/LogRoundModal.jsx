@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import ShareRoundModal from './ShareRoundModal.jsx'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { B, serif, sans } from '../lib/data.js'
@@ -47,9 +49,18 @@ function HalfStarPicker({ value, onChange, color }) {
   )
 }
 
-function SuccessScreen({ courseName, score, overall, onClose, onViewFeed }) {
+function SuccessScreen({ courseName, courseId, score, overall, round, course, onClose, onViewFeed }) {
+  const [showShare, setShowShare] = useState(false)
   return (
     <div style={{ textAlign:'center', padding:'20px 0' }}>
+      {showShare && round && (
+        <ShareRoundModal
+          round={round}
+          course={course}
+          onClose={() => setShowShare(false)}
+        />
+      )}
+
       {/* Animated checkmark */}
       <div style={{ width:72, height:72, borderRadius:'50%', background:'#e8f5e9', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 20px' }}>
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={B.green} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -79,12 +90,16 @@ function SuccessScreen({ courseName, score, overall, onClose, onViewFeed }) {
       </div>
 
       <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+        <button onClick={() => setShowShare(true)}
+          style={{ width:'100%', background:B.gold, color:B.navy, border:'none', borderRadius:12, padding:'13px 0', fontWeight:800, fontSize:15, cursor:'pointer', fontFamily:serif, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+          📤 Share Your Round
+        </button>
         <button onClick={onViewFeed}
           style={{ width:'100%', background:B.navy, color:B.cream, border:'none', borderRadius:12, padding:'13px 0', fontWeight:700, fontSize:14, cursor:'pointer', fontFamily:sans }}>
           View in Community Feed
         </button>
         <button onClick={onClose}
-          style={{ width:'100%', background:B.gold, color:B.navy, border:'none', borderRadius:12, padding:'13px 0', fontWeight:800, fontSize:14, cursor:'pointer', fontFamily:serif }}>
+          style={{ width:'100%', background:B.white, color:B.textMid, border:`1px solid ${B.border}`, borderRadius:12, padding:'12px 0', fontWeight:600, fontSize:13, cursor:'pointer', fontFamily:sans }}>
           Done
         </button>
       </div>
@@ -94,6 +109,7 @@ function SuccessScreen({ courseName, score, overall, onClose, onViewFeed }) {
 
 export default function LogRoundModal({ courseId, courseName, onClose, onSuccess }) {
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [step, setStep]           = useState('form') // 'form' | 'success'
   const [score, setScore]         = useState('')
@@ -102,8 +118,9 @@ export default function LogRoundModal({ courseId, courseName, onClose, onSuccess
   const [vibes, setVibes]         = useState(0)
   const [comment, setComment]     = useState('')
   const [playedAt, setPlayedAt]   = useState(new Date().toISOString().split('T')[0])
-  const [loading, setLoading]     = useState(false)
-  const [error, setError]         = useState('')
+  const [loading,    setLoading]    = useState(false)
+  const [error,      setError]      = useState('')
+  const [savedRound, setSavedRound] = useState(null)
 
   const overall = conditions && value && vibes
     ? ((conditions + value + vibes) / 3).toFixed(1)
@@ -138,6 +155,14 @@ export default function LogRoundModal({ courseId, courseName, onClose, onSuccess
       })
       if (err) throw err
       onSuccess()
+      setSavedRound({
+        overall_rating:    parseFloat(overall),
+        conditions_rating: conditions,
+        value_rating:      value,
+        vibes_rating:      vibes,
+        score:             score ? parseInt(score) : null,
+        comment:           comment || null,
+      })
       setStep('success')
     } catch (err) {
       setError(err.message)
@@ -169,8 +194,10 @@ export default function LogRoundModal({ courseId, courseName, onClose, onSuccess
             courseName={courseName}
             score={score || null}
             overall={overall}
+            round={savedRound}
+            course={{ id: courseId, name: courseName }}
             onClose={onClose}
-            onViewFeed={() => { onClose(); window.location.href = '/feed' }}
+            onViewFeed={() => { onClose(); navigate('/feed') }}
           />
         ) : (
           <>
