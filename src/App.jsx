@@ -34,26 +34,26 @@ export default function App() {
     <div style={{ fontFamily:sans, background:'#F7F4EE', minHeight:'100vh' }}>
 
       {!hideNav && (
-        <div style={{ background:B.navy, borderBottom:'1px solid rgba(240,232,213,0.08)', padding:'0 18px', display:'flex', alignItems:'center', justifyContent:'space-between', height:58, position:'sticky', top:0, zIndex:300 }}>
-          <button onClick={() => nav('discover')} style={{ background:'none', border:'none', cursor:'pointer', padding:0 }}>
+        <div style={{ background:B.navy, borderBottom:'1px solid rgba(240,232,213,0.08)', padding:'0 10px', display:'flex', alignItems:'center', justifyContent:'space-between', height:58, position:'sticky', top:0, zIndex:300 }}>
+          <button onClick={() => nav('discover')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, flexShrink:0 }}>
             <Logo size="sm" theme="navy"/>
           </button>
-          <div style={{ display:'flex', gap:2, alignItems:'center' }}>
+          <div style={{ display:'flex', gap:1, alignItems:'center' }}>
             {NAV_TABS.map(t => (
               <button key={t.id} onClick={() => nav(t.id)}
-                style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:1, padding:'5px 9px', borderRadius:9, border:'none', background:activeTab===t.id ? 'rgba(196,150,58,0.15)':'transparent', color:activeTab===t.id ? B.gold:'rgba(240,232,213,0.45)', cursor:'pointer', transition:'all 0.15s' }}>
-                <span style={{ fontSize:15 }}>{t.icon}</span>
-                <span style={{ fontSize:9, fontFamily:sans, fontWeight:600 }}>{t.label}</span>
+                style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:1, padding:'5px 7px', borderRadius:9, border:'none', background:activeTab===t.id ? 'rgba(196,150,58,0.15)':'transparent', color:activeTab===t.id ? B.gold:'rgba(240,232,213,0.45)', cursor:'pointer', transition:'all 0.15s' }}>
+                <span style={{ fontSize:14 }}>{t.icon}</span>
+                <span style={{ fontSize:8, fontFamily:sans, fontWeight:600 }}>{t.label}</span>
               </button>
             ))}
             {user ? (
               <button onClick={() => signOut().then(() => navigate('/auth'))}
-                style={{ marginLeft:8, padding:'6px 12px', borderRadius:8, border:`1px solid rgba(240,232,213,0.2)`, background:'transparent', color:'rgba(240,232,213,0.6)', fontSize:11, fontFamily:sans, cursor:'pointer' }}>
-                Sign out
+                style={{ marginLeft:4, padding:'5px 8px', borderRadius:8, border:`1px solid rgba(240,232,213,0.2)`, background:'transparent', color:'rgba(240,232,213,0.6)', fontSize:10, fontFamily:sans, cursor:'pointer', whiteSpace:'nowrap' }}>
+                Out
               </button>
             ) : (
               <button onClick={() => navigate('/auth')}
-                style={{ marginLeft:8, padding:'6px 14px', borderRadius:8, border:'none', background:B.gold, color:B.navy, fontSize:12, fontWeight:700, fontFamily:sans, cursor:'pointer' }}>
+                style={{ marginLeft:4, padding:'5px 10px', borderRadius:8, border:'none', background:B.gold, color:B.navy, fontSize:11, fontWeight:700, fontFamily:sans, cursor:'pointer', whiteSpace:'nowrap' }}>
                 Sign in
               </button>
             )}
@@ -70,18 +70,18 @@ export default function App() {
           <Route path="/map"        element={<MapPage />} />
           <Route path="/auth"       element={<Auth />} />
           <Route path="/course/:id" element={<CourseDetail />} />
+          <Route path="/submit"     element={<SubmitCourse />} />
           <Route path="/profile"    element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/submit" element={<SubmitCourse />} />
         </Routes>
       </div>
 
       {!hideNav && (
-        <div style={{ position:'fixed', bottom:0, left:0, right:0, background:B.navy, borderTop:'1px solid rgba(240,232,213,0.08)', padding:'7px 0 14px', display:'flex', justifyContent:'space-around', zIndex:300 }}>
+        <div style={{ position:'fixed', bottom:0, left:0, right:0, background:B.navy, borderTop:'1px solid rgba(240,232,213,0.08)', padding:'6px 0 12px', display:'flex', justifyContent:'space-around', zIndex:300 }}>
           {NAV_TABS.map(t => (
             <button key={t.id} onClick={() => nav(t.id)}
-              style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:3, background:'none', border:'none', cursor:'pointer', padding:'3px 10px' }}>
-              <span style={{ fontSize:20 }}>{t.icon}</span>
-              <span style={{ fontSize:10, fontWeight:600, color:activeTab===t.id ? B.gold:'rgba(240,232,213,0.38)', fontFamily:sans }}>{t.label}</span>
+              style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:2, background:'none', border:'none', cursor:'pointer', padding:'3px 4px', flex:1, minWidth:0 }}>
+              <span style={{ fontSize:18 }}>{t.icon}</span>
+              <span style={{ fontSize:8, fontWeight:600, color:activeTab===t.id ? B.gold:'rgba(240,232,213,0.38)', fontFamily:sans, whiteSpace:'nowrap' }}>{t.label}</span>
             </button>
           ))}
         </div>
