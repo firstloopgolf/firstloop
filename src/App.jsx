@@ -154,8 +154,19 @@ function dismissIOSPrompt() {
             </button>
           </div>
           <div style={{ background:'rgba(255,255,255,0.06)', borderRadius:10, padding:'10px 14px' }}>
-            <div style={{ color:'rgba(240,232,213,0.8)', fontSize:12, fontFamily:sans, lineHeight:1.6 }}>
-              Tap <strong style={{ color:B.gold }}>Share</strong> at the bottom of your browser, then tap <strong style={{ color:B.gold }}>"Add to Home Screen"</strong>
+            <div style={{ color:'rgba(240,232,213,0.8)', fontSize:12, fontFamily:sans, lineHeight:1.7 }}>
+              <div style={{ display:'flex', alignItems:'flex-start', gap:8, marginBottom:8 }}>
+                <span style={{ color:B.gold, fontWeight:700, flexShrink:0 }}>1.</span>
+                <span>Tap the <strong style={{ color:B.gold }}>Share button</strong> at the bottom of Safari — it looks like a box with an arrow pointing up ↑</span>
+              </div>
+              <div style={{ display:'flex', alignItems:'flex-start', gap:8, marginBottom:8 }}>
+                <span style={{ color:B.gold, fontWeight:700, flexShrink:0 }}>2.</span>
+                <span>Scroll down in the menu and tap <strong style={{ color:B.gold }}>"Add to Home Screen"</strong></span>
+              </div>
+              <div style={{ display:'flex', alignItems:'flex-start', gap:8 }}>
+                <span style={{ color:B.gold, fontWeight:700, flexShrink:0 }}>3.</span>
+                <span>Tap <strong style={{ color:B.gold }}>"Add"</strong> in the top right corner</span>
+              </div>
             </div>
           </div>
         </div>
