@@ -2,23 +2,20 @@ import { useState } from 'react'
 import { B, serif, sans } from '../lib/data.js'
 
 export function Logo({ size = 'md', theme = 'navy' }) {
-  const s = { sm:{icon:22,t1:9,t2:18}, md:{icon:28,t1:11,t2:24}, lg:{icon:42,t1:14,t2:36} }[size]
-  const fg = { navy:B.cream, cream:B.navy, white:B.navy }[theme] || B.cream
+  const heights = { sm: 36, md: 48, lg: 72 }
+  const height  = heights[size]
+
   return (
-    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-      <svg width={s.icon} height={s.icon*1.25} viewBox="0 0 28 35" fill="none">
-        <ellipse cx="13" cy="5" rx="4" ry="4" fill={fg}/>
-        <rect x="5" y="9" width="14" height="11" rx="3" fill={fg}/>
-        <rect x="7" y="20" width="4.5" height="12" rx="2" fill={fg}/>
-        <rect x="13.5" y="20" width="4.5" height="12" rx="2" fill={fg}/>
-        <rect x="18" y="1" width="2" height="20" rx="1" fill={fg}/>
-        <path d="M20 1 L27 5.5 L20 8 Z" fill={B.gold}/>
-      </svg>
-      <div style={{ lineHeight:1 }}>
-        <div style={{ fontFamily:serif, fontSize:s.t1, fontWeight:700, letterSpacing:'0.28em', color:B.gold, textTransform:'uppercase', marginBottom:1 }}>FIRST</div>
-        <div style={{ fontFamily:serif, fontSize:s.t2, fontWeight:900, color:fg, lineHeight:1, letterSpacing:'-0.02em' }}>LOOP</div>
-      </div>
-    </div>
+    <img
+      src="/logo.png"
+      alt="First Loop"
+      style={{
+        height,
+        width: 'auto',
+        objectFit: 'contain',
+        display: 'block',
+      }}
+    />
   )
 }
 
