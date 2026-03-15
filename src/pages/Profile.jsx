@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext.jsx'
 import { B, serif, sans, COURSES } from '../lib/data.js'
 import { Pill } from '../components/UI.jsx'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
+import CourseSuggestions from '../components/CourseSuggestions.jsx'
 
 export default function Profile() {
   const navigate                    = useNavigate()
@@ -214,7 +215,9 @@ export default function Profile() {
               })}
             </div>
           )}
+            <CourseSuggestions />
         </div>
+        
       )}
 
       {/* ── STATS ── */}

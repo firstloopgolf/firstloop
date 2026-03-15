@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { B, serif, sans } from '../lib/data.js'
 import { CourseCard } from '../components/UI.jsx'
 import { useCourses } from '../hooks/useCourses.js'
+import CourseSuggestions from '../components/CourseSuggestions.jsx'
 
 const STATES = [
   'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
@@ -246,5 +247,6 @@ export default function Discover() {
         </div>
       )}
     </div>
+    {!q && activeFilterCount === 0 && <CourseSuggestions />}
   )
 }

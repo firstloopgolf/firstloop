@@ -109,6 +109,13 @@ export default function CourseDetail() {
                     {round.overall_rating && <RatingChip value={round.overall_rating}/>}
                   </div>
                   {round.comment && <p style={{ margin:'0 0 12px', fontSize:14, color:B.textNavy, lineHeight:1.65, fontFamily:sans, fontStyle:'italic' }}>"{round.comment}"</p>}
+                  {round.photo_url && (
+                    <div style={{ borderRadius:12, overflow:'hidden', marginBottom:12 }}>
+                      <img src={round.photo_url} alt="Round photo"
+                        style={{ width:'100%', maxHeight:240, objectFit:'cover', display:'block' }}/>
+                    </div>
+                  )
+                  }
                   <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:12 }}>
                     {round.conditions_rating && <RatingRow label="Conditions" value={round.conditions_rating} color={B.green}/>}
                     {round.value_rating      && <RatingRow label="Value"      value={round.value_rating}      color={B.navy}/>}

@@ -111,6 +111,14 @@ export default function Feed() {
                       "{round.comment}"
                     </p>
                   )}
+                  
+                  {round.photo_url && (
+                    <div style={{ borderRadius:12, overflow:'hidden', marginBottom:12 }}>
+                      <img src={round.photo_url} alt="Round photo"
+                        style={{ width:'100%', maxHeight:240, objectFit:'cover', display:'block' }}/>
+                    </div>
+                  )
+                  }
 
                   <div style={{ display:'flex', flexDirection:'column', gap:5, marginBottom:12 }}>
                     {round.conditions_rating && <RatingRow label="Conditions" value={round.conditions_rating} color={B.green}/>}
@@ -120,11 +128,15 @@ export default function Feed() {
 
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:10, borderTop:`1px solid ${B.feedBg}` }}>
                     <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-                      {round.score && (
-                        <span style={{ background:B.feedBg, border:`1px solid ${B.border}`, borderRadius:999, padding:'4px 12px', fontSize:12, fontWeight:700, fontFamily:sans, color:B.textNavy }}>
-                          ⛳ Score: {round.score}
-                        </span>
-                      )}
+                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+  {round.score && (
+    <span style={{ background:B.feedBg, border:`1px solid ${B.border}`, borderRadius:999, padding:'4px 12px', fontSize:12, fontWeight:700, fontFamily:sans, color:B.textNavy }}>⛳ Score: {round.score}</span>
+  )}
+  <button onClick={() => setShareRound(round)}
+    style={{ background:'none', border:`1px solid ${B.border}`, borderRadius:999, padding:'4px 14px', cursor:'pointer', fontSize:12, color:B.textMid, fontFamily:sans, fontWeight:600, display:'flex', alignItems:'center', gap:5 }}>
+    📤 Share
+  </button>
+</div>
                     </div>
                     <button onClick={() => toggleLike(round.id)}
                       style={{ background:'none', border:`1px solid ${liked[round.id] ? B.gold:B.border}`, borderRadius:999, padding:'5px 14px', cursor:'pointer', fontSize:12, color:liked[round.id] ? B.gold:B.textSoft, fontFamily:sans, fontWeight:600, transition:'all 0.15s' }}>
