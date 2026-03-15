@@ -25,14 +25,16 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function fetchProfile(userId) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    setProfile(data)
-    setLoading(false)
-  }
+  const { data } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single()
+  setProfile(data)
+  setLoading(false)
+}
+
+const isAdmin = profile?.is_admin === true
 
   async function signUp(email, password, username, fullName) {
   const { data, error } = await supabase.auth.signUp({
@@ -58,7 +60,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut, fetchProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut, fetchProfile, isAdmin: profile?.is_admin === true }}>
       {children}
     </AuthContext.Provider>
   )

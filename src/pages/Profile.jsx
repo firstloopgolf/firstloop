@@ -8,7 +8,7 @@ import ShareRoundModal from '../components/ShareRoundModal.jsx'
 
 export default function Profile() {
   const navigate                    = useNavigate()
-  const { user, profile, signOut, fetchProfile } = useAuth()
+  const { user, profile, signOut, fetchProfile, isAdmin } = useAuth()
   const [tab, setTab]               = useState('rounds')
   const [rounds, setRounds]         = useState([])
   const [loading, setLoading]       = useState(true)
@@ -313,8 +313,14 @@ export default function Profile() {
 
           <div style={{ borderTop:`1px solid ${B.border}`, paddingTop:16, marginTop:6 }}>
             <div style={{ fontSize:12, color:B.textSoft, fontFamily:sans, marginBottom:8 }}>Account email: {user?.email}</div>
+            {isAdmin && (
+              <button onClick={() => navigate('/admin')}
+                style={{ width:'100%', background:B.navy, color:B.cream, border:'none', borderRadius:12, padding:'13px 0', fontWeight:700, fontSize:14, cursor:'pointer', fontFamily:sans, marginBottom:10 }}>
+                ⚙️ Admin Dashboard
+              </button>
+            )}
             <button onClick={() => signOut().then(() => navigate('/auth'))}
-              style={{ width:'100%', background:'#fff', color:B.textMid, border:`1px solid ${B.border}`, borderRadius:12, padding:'11px 0', fontWeight:600, fontSize:13, cursor:'pointer', fontFamily:sans }}>
+              style={{ width:'100%', background:'#fff', color:B.textMid, border:`1px solid ${B.border}`, borderRadius:12, padding:'13px 0', fontWeight:600, fontSize:14, cursor:'pointer', fontFamily:sans }}>
               Sign Out
             </button>
           </div>

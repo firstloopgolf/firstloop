@@ -12,6 +12,7 @@ import Auth         from './pages/Auth.jsx'
 import Landing      from './pages/Landing.jsx'
 import SubmitCourse from './pages/SubmitCourse.jsx'
 import { useEffect, useState } from 'react'
+import Admin from './pages/Admin.jsx'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -104,6 +105,7 @@ function dismissIOSPrompt() {
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/submit"     element={<SubmitCourse />} />
           <Route path="/profile"    element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/admin"      element={<Admin />} />
         </Routes>
       </div>
 
@@ -157,11 +159,11 @@ function dismissIOSPrompt() {
             <div style={{ color:'rgba(240,232,213,0.8)', fontSize:12, fontFamily:sans, lineHeight:1.7 }}>
               <div style={{ display:'flex', alignItems:'flex-start', gap:8, marginBottom:8 }}>
                 <span style={{ color:B.gold, fontWeight:700, flexShrink:0 }}>1.</span>
-                <span>Tap the <strong style={{ color:B.gold }}>Share button</strong> at the bottom of Safari — it looks like a box with an arrow pointing up ↑</span>
+                <span>Tap the <strong style={{ color:B.gold }}>Share button</strong> at the bottom of Safari — you may need to press . . . first</span>
               </div>
               <div style={{ display:'flex', alignItems:'flex-start', gap:8, marginBottom:8 }}>
                 <span style={{ color:B.gold, fontWeight:700, flexShrink:0 }}>2.</span>
-                <span>Scroll down in the menu and tap <strong style={{ color:B.gold }}>"Add to Home Screen"</strong></span>
+                <span>Scroll down in the menu and tap <strong style={{ color:B.gold }}>"More & Add to Home Screen"</strong></span>
               </div>
               <div style={{ display:'flex', alignItems:'flex-start', gap:8 }}>
                 <span style={{ color:B.gold, fontWeight:700, flexShrink:0 }}>3.</span>
