@@ -226,7 +226,7 @@ export default function LogRoundModal({ courseId, courseName, onClose, onSuccess
                 {[
                   ['⛺ Course Conditions', conditions, setConditions, B.green],
                   ['💰 Value for Money',   value,      setValue,      B.navy],
-                  ['🏌️ Facilities & Vibes', vibes,    setVibes,      B.gold],
+                  ['🏌️ Facilities', vibes,    setVibes,      B.gold],
                 ].map(([label, val, setter, color]) => (
                   <div key={label}>
                     <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>

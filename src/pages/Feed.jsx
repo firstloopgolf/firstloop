@@ -115,7 +115,7 @@ export default function Feed() {
                   <div style={{ display:'flex', flexDirection:'column', gap:5, marginBottom:12 }}>
                     {round.conditions_rating && <RatingRow label="Conditions" value={round.conditions_rating} color={B.green}/>}
                     {round.value_rating      && <RatingRow label="Value"      value={round.value_rating}      color={B.navy}/>}
-                    {round.vibes_rating      && <RatingRow label="Vibes"      value={round.vibes_rating}      color={B.gold}/>}
+                    {round.vibes_rating      && <RatingRow label="Facilities"      value={round.vibes_rating}      color={B.gold}/>}
                   </div>
 
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:10, borderTop:`1px solid ${B.feedBg}` }}>

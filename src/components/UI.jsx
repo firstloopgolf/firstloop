@@ -115,7 +115,7 @@ export function CourseCard({ course, onClick, row }) {
           </div>
         </div>
         <div style={{ display:'flex', gap:6 }}>
-          {[['Conditions',course.conditions,B.green],['Value',course.value,B.navy],['Vibes',course.vibes,B.gold]].map(([l,v,c]) => (
+          {[['Conditions',course.conditions,B.green],['Value',course.value,B.navy],['Facilities',course.vibes,B.gold]].map(([l,v,c]) => (
             <div key={l} style={{ flex:1, background:B.feedBg, borderRadius:8, padding:'6px 4px', textAlign:'center', border:`1px solid ${B.border}` }}>
               <div style={{ fontSize:13, fontWeight:800, color:c, fontFamily:serif }}>{v.toFixed(1)}</div>
               <div style={{ fontSize:9, color:B.textSoft, fontFamily:sans, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em' }}>{l}</div>

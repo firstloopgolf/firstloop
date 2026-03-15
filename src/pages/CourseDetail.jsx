@@ -110,7 +110,7 @@ export default function CourseDetail() {
                   <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:12 }}>
                     {round.conditions_rating && <RatingRow label="Conditions" value={round.conditions_rating} color={B.green}/>}
                     {round.value_rating      && <RatingRow label="Value"      value={round.value_rating}      color={B.navy}/>}
-                    {round.vibes_rating      && <RatingRow label="Vibes"      value={round.vibes_rating}      color={B.gold}/>}
+                    {round.vibes_rating      && <RatingRow label="Facilities"      value={round.vibes_rating}      color={B.gold}/>}
                   </div>
                   {round.score && (
                     <span style={{ background:B.feedBg, border:`1px solid ${B.border}`, borderRadius:999, padding:'4px 12px', fontSize:12, fontWeight:700, fontFamily:sans, color:B.textNavy }}>⛳ Score: {round.score}</span>
@@ -131,7 +131,7 @@ export default function CourseDetail() {
             </div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
-            {[['⛺ Course Conditions',course.conditions,B.green],['💰 Value for Money',course.value,B.navy],['🏌️ Facilities & Vibes',course.vibes,B.gold]].map(([label,val,color]) => (
+            {[['⛺ Course Conditions',course.conditions,B.green],['💰 Value for Money',course.value,B.navy],['🏌️ Facilities',course.vibes,B.gold]].map(([label,val,color]) => (
               <div key={label}>
                 <div style={{ display:'flex', justifyContent:'space-between', marginBottom:8 }}>
                   <span style={{ fontSize:14, fontWeight:600, color:B.textNavy, fontFamily:sans }}>{label}</span>
