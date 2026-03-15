@@ -27,11 +27,10 @@ export default function CourseSuggestions() {
       if (!myRounds || myRounds.length === 0) {
         // New user — show top rated courses
         const { data: top } = await supabase
-          .from('courses')
-          .select('*')
-          .gt('rating', 0)
-          .order('rating', { ascending: false })
-          .limit(6)
+            .from('courses')
+            .select('*')
+            .order('rating', { ascending: false })
+            .limit(6)
         setSuggestions((top || []).map(normalizeCourse))
         setReason('Top rated courses to get you started')
         setLoading(false)
@@ -62,10 +61,9 @@ export default function CourseSuggestions() {
 
       // Find similar courses they haven't played
       let query = supabase
-        .from('courses')
-        .select('*')
-        .gt('rating', 0)
-        .not('id', 'in', `(${playedIds.join(',')})`)
+            .from('courses')
+            .select('*')
+            .not('id', 'in', `(${playedIds.join(',')})`)
 
       // Weight by what they care about most
       if (topPriority === 'conditions') {
@@ -78,10 +76,19 @@ export default function CourseSuggestions() {
 
       const { data: candidates } = await query.limit(20)
 
-      if (!candidates || candidates.length === 0) {
+        if (!candidates || candidates.length === 0) {
+        // Fall back to top rated
+        const { data: fallback } = await supabase
+            .from('courses')
+            .select('*')
+            .not('id', 'in', `(${playedIds.join(',')})`)
+            .order('rating', { ascending: false })
+            .limit(6)
+        setSuggestions((fallback || []).map(normalizeCourse))
+        setReason('Top rated courses you haven\'t played yet')
         setLoading(false)
         return
-      }
+        }
 
       // Score each candidate
       const scored = candidates.map(c => {
