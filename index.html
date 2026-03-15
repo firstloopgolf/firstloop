@@ -2,9 +2,51 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>firstloop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary Meta -->
+    <title>First Loop — Rate, Rank & Discover Golf Courses</title>
+    <meta name="description" content="Track every course you play. Rate the conditions, value & facilities. Discover your next great round." />
+    <meta name="theme-color" content="#1B3054" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="First Loop" />
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/logo.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/logo.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/logo.png" />
+
+    <!-- Open Graph — for sharing links -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://firstloop.vercel.app" />
+    <meta property="og:title" content="First Loop — Rate, Rank & Discover Golf Courses" />
+    <meta property="og:description" content="Track every course you play. Rate the conditions, value & facilities. Discover your next great round." />
+    <meta property="og:image" content="/logo.png" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="First Loop" />
+    <meta name="twitter:description" content="Rate, rank & discover the best golf courses in America." />
+    <meta name="twitter:image" content="/logo.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <!-- Safe area for iPhone notch -->
+    <style>
+      body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+    </style>
   </head>
   <body>
     <div id="root"></div>

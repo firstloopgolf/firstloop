@@ -11,6 +11,7 @@ import CourseDetail from './pages/CourseDetail.jsx'
 import Auth         from './pages/Auth.jsx'
 import Landing      from './pages/Landing.jsx'
 import SubmitCourse from './pages/SubmitCourse.jsx'
+import { useEffect, useState } from 'react'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -27,6 +28,37 @@ export default function App() {
   const isAuth    = location.pathname === '/auth'
   const isLanding = location.pathname === '/landing'
   const hideNav   = isAuth || isLanding
+
+  const [installPrompt, setInstallPrompt] = useState(null)
+  const [showIOSPrompt, setShowIOSPrompt] = useState(false)
+
+useEffect(() => {
+  // Android install prompt
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault()
+    setInstallPrompt(e)
+  })
+
+  // iOS prompt — show once per session if on iOS Safari
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+  const hasSeenPrompt = sessionStorage.getItem('iosPromptSeen')
+  if (isIOS && !isStandalone && !hasSeenPrompt) {
+    setTimeout(() => setShowIOSPrompt(true), 3000)
+  }
+}, [])
+
+async function handleInstall() {
+  if (!installPrompt) return
+  installPrompt.prompt()
+  const { outcome } = await installPrompt.userChoice
+  if (outcome === 'accepted') setInstallPrompt(null)
+}
+
+function dismissIOSPrompt() {
+  sessionStorage.setItem('iosPromptSeen', 'true')
+  setShowIOSPrompt(false)
+}
 
   const nav = (tab) => navigate(tab === 'discover' ? '/' : `/${tab}`)
 
@@ -86,7 +118,48 @@ export default function App() {
           ))}
         </div>
       )}
+    {/* Android install banner */}
+      {installPrompt && !hideNav && (
+        <div style={{ position:'fixed', bottom:70, left:12, right:12, background:B.navy, borderRadius:16, padding:'14px 18px', display:'flex', alignItems:'center', gap:12, zIndex:400, boxShadow:'0 8px 32px rgba(0,0,0,0.3)', border:`1px solid rgba(196,150,58,0.3)` }}>
+          <div style={{ fontSize:28 }}>⛳</div>
+          <div style={{ flex:1 }}>
+            <div style={{ color:B.cream, fontSize:13, fontWeight:700, fontFamily:sans }}>Install First Loop</div>
+            <div style={{ color:'rgba(240,232,213,0.6)', fontSize:11, fontFamily:sans }}>Add to your home screen for the best experience</div>
+          </div>
+          <button onClick={handleInstall}
+            style={{ background:B.gold, color:B.navy, border:'none', borderRadius:10, padding:'8px 14px', fontWeight:700, fontSize:12, cursor:'pointer', fontFamily:sans, flexShrink:0 }}>
+            Install
+          </button>
+          <button onClick={() => setInstallPrompt(null)}
+            style={{ background:'none', border:'none', color:'rgba(240,232,213,0.4)', cursor:'pointer', fontSize:18, padding:0, flexShrink:0 }}>
+            ✕
+          </button>
+        </div>
+      )}
 
+      {/* iOS install prompt */}
+      {showIOSPrompt && !hideNav && (
+        <div style={{ position:'fixed', bottom:70, left:12, right:12, background:B.navy, borderRadius:16, padding:'16px 18px', zIndex:400, boxShadow:'0 8px 32px rgba(0,0,0,0.3)', border:`1px solid rgba(196,150,58,0.3)` }}>
+          <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:10 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+              <div style={{ fontSize:28 }}>⛳</div>
+              <div>
+                <div style={{ color:B.cream, fontSize:13, fontWeight:700, fontFamily:sans }}>Install First Loop</div>
+                <div style={{ color:'rgba(240,232,213,0.6)', fontSize:11, fontFamily:sans }}>Add to your home screen</div>
+              </div>
+            </div>
+            <button onClick={dismissIOSPrompt}
+              style={{ background:'none', border:'none', color:'rgba(240,232,213,0.4)', cursor:'pointer', fontSize:18, padding:0 }}>
+              ✕
+            </button>
+          </div>
+          <div style={{ background:'rgba(255,255,255,0.06)', borderRadius:10, padding:'10px 14px' }}>
+            <div style={{ color:'rgba(240,232,213,0.8)', fontSize:12, fontFamily:sans, lineHeight:1.6 }}>
+              Tap <strong style={{ color:B.gold }}>Share</strong> at the bottom of your browser, then tap <strong style={{ color:B.gold }}>"Add to Home Screen"</strong>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
