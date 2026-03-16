@@ -7,7 +7,6 @@ import { Avatar, RatingChip, RatingRow, NatBadge, StatBadge, TabBar } from '../c
 import LogRoundModal from '../components/LogRoundModal.jsx'
 import { useCourse } from '../hooks/useCourses.js'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
-import { useEffect } from 'react'
 
 export default function CourseDetail() {
   const { id }   = useParams()
