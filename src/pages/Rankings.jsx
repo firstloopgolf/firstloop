@@ -22,7 +22,7 @@ export default function Rankings() {
   const navigate = useNavigate()
   const { courses, loading } = useCourses()
   const [tab, setTab]     = useState('national')
-  const [state, setState] = useState('NY')
+  const [selectedState, setSelectedState] = useState("NY");
 
   const nat = courses
     .filter(c => c.natRank <= 100)
@@ -47,7 +47,7 @@ export default function Rankings() {
           <div style={{ fontSize:11, fontWeight:600, color:B.textSoft, fontFamily:sans, marginBottom:8, textTransform:'uppercase', letterSpacing:'0.06em' }}>Select State</div>
           <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
             {allStates.map(s => (
-              <button key={s} onClick={() => setState(s)} style={{ padding:'5px 13px', borderRadius:999, border:`1.5px solid ${state===s ? B.gold:B.border}`, background:state===s ? B.goldPale:'#fff', color:state===s ? B.navy:B.textMid, fontWeight:700, cursor:'pointer', fontSize:12, fontFamily:sans, transition:'all 0.12s' }}>{s}</button>
+              <button key={s} onClick={() => setSelectedState(s)} style={{ padding:'5px 13px', borderRadius:999, border:`1.5px solid ${state===s ? B.gold:B.border}`, background:state===s ? B.goldPale:'#fff', color:state===s ? B.navy:B.textMid, fontWeight:700, cursor:'pointer', fontSize:12, fontFamily:sans, transition:'all 0.12s' }}>{s}</button>
             ))}
           </div>
         </div>
