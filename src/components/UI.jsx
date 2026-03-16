@@ -2,23 +2,23 @@ import { useState } from 'react'
 import { B, serif, sans } from '../lib/data.js'
 
 export function Logo({ size = 'md', theme = 'navy' }) {
-  const heights = { sm: 44, md: 56, lg: 80 }
+  const heights = { sm: 40, md: 52, lg: 76 }
   const height  = heights[size]
 
+  // Navy bg logo for dark surfaces, white bg logo for light surfaces
+  const src = theme === 'light' ? '/logo-light.png' : '/logo.png'
+
   return (
-    <div style={{ display:'flex', alignItems:'center', height }}>
-      <img
-        src="/logo.png"
-        alt="First Loop"
-        style={{
-          height,
-          width: 'auto',
-          objectFit: 'contain',
-          display: 'block',
-          filter: 'brightness(0) invert(1)',
-        }}
-      />
-    </div>
+    <img
+      src={src}
+      alt="First Loop"
+      style={{
+        height,
+        width: 'auto',
+        objectFit: 'contain',
+        display: 'block',
+      }}
+    />
   )
 }
 
