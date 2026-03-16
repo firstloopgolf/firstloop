@@ -91,11 +91,18 @@ export default function MapPage() {
     filteredCourses.forEach(course => {
       if (!course.lat || !course.lng) return
 
-      const isNational = course.natRank < 999
       const isTop10    = course.natRank <= 10
-      const color      = isTop10 ? '#C4963A' : isNational ? '#1B3054' : '#1E4530'
-      const size       = isTop10 ? 14 : isNational ? 11 : 8
-      const border     = isTop10 ? '#F0E8D5' : '#ffffff'
+      const isNational = course.natRank > 10  && course.natRank < 999
+      const isTopState = course.natRank >= 999 && course.stRank <= 20
+      const color      = isTop10    ? '#C4963A'  // Gold — top 10 national
+                      : isNational ? '#1B3054'  // Navy — top 100 national
+                      : isTopState ? '#1E4530'  // Green — top state
+                      :              '#7B1F1F'  // Burgundy — all others 
+      const size       = isTop10    ? 14
+                      : isNational ? 11
+                      : isTopState ? 9
+                      :              7
+      const border     = isTop10    ? '#F0E8D5' : '#ffffff'
 
       // Custom circle marker
       const icon = L.divIcon({
@@ -257,9 +264,13 @@ export default function MapPage() {
             <span style={{ fontSize:11, color:B.textMid, fontFamily:sans }}>Top 100 National</span>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-            <div style={{ width:8, height:8, borderRadius:'50%', background:'#1E4530', border:'2px solid #fff' }}/>
-            <span style={{ fontSize:11, color:B.textMid, fontFamily:sans }}>All Courses</span>
+            <div style={{ width:9, height:9, borderRadius:'50%', background:'#1E4530', border:'2px solid #fff' }}/>
+            <span style={{ fontSize:11, color:B.textMid, fontFamily:sans }}>Top State</span>
           </div>
+          <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+            <div style={{ width:7, height:7, borderRadius:'50%', background:'#7B1F1F', border:'2px solid #fff' }}/>
+            <span style={{ fontSize:11, color:B.textMid, fontFamily:sans }}>All Courses</span>
+          </div> 
           <button onClick={resetView}
             style={{ marginLeft:'auto', background:B.feedBg, border:`1px solid ${B.border}`, borderRadius:8, padding:'5px 12px', cursor:'pointer', fontSize:11, color:B.textMid, fontFamily:sans }}>
             🇺🇸 Reset View
