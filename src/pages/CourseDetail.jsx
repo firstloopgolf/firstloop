@@ -7,6 +7,7 @@ import { Avatar, RatingChip, RatingRow, NatBadge, StatBadge, TabBar } from '../c
 import LogRoundModal from '../components/LogRoundModal.jsx'
 import { useCourse } from '../hooks/useCourses.js'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
+import { useEffect } from 'react'
 
 export default function CourseDetail() {
   const { id }   = useParams()
@@ -21,6 +22,21 @@ export default function CourseDetail() {
   const [shareRound, setShareRound] = useState(null)
 
   useEffect(() => { if (id) fetchRounds() }, [id])
+
+    // Update page title and meta for SEO
+    useEffect(() => {
+      if (course) {
+        document.title = `${course.name} — Reviews & Ratings | First Loop`
+        const desc = document.querySelector('meta[name="description"]')
+        if (desc) desc.setAttribute('content',
+          `${course.name} in ${course.location}. Rated ${course.rating}/10 by real golfers. Read reviews on course conditions, value, and facilities on First Loop.`
+        )
+      }
+      return () => {
+        document.title = 'First Loop — Rate, Rank & Discover Golf Courses'
+      }
+    }, [course])
+
 
   async function fetchRounds() {
     setLoadingRounds(true)

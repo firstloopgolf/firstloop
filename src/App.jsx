@@ -13,6 +13,7 @@ import Landing      from './pages/Landing.jsx'
 import SubmitCourse from './pages/SubmitCourse.jsx'
 import { useEffect, useState } from 'react'
 import Admin from './pages/Admin.jsx'
+import { useEffect } from 'react'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -29,9 +30,22 @@ export default function App() {
   const isAuth    = location.pathname === '/auth'
   const isLanding = location.pathname === '/landing'
   const hideNav   = isAuth || isLanding
-
   const [installPrompt, setInstallPrompt] = useState(null)
   const [showIOSPrompt, setShowIOSPrompt] = useState(false)
+
+useEffect(() => {
+  const titles = {
+    discover: 'Discover Golf Courses | First Loop',
+    feed:     'Community Feed | First Loop',
+    rankings: 'Golf Course Rankings | First Loop',
+    map:      'Golf Course Map | First Loop',
+    profile:  'My Profile | First Loop',
+    submit:   'Submit a Course | First Loop',
+  }
+  if (titles[activeTab]) {
+    document.title = titles[activeTab]
+  }
+}, [activeTab])
 
 useEffect(() => {
   // Android install prompt
