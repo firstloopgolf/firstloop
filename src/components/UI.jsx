@@ -2,23 +2,39 @@ import { useState } from 'react'
 import { B, serif, sans } from '../lib/data.js'
 
 export function Logo({ size = 'md', theme = 'navy' }) {
-  const heights = { sm: 40, md: 52, lg: 76 }
-  const height  = heights[size]
+  const heights  = { sm: 36, md: 48, lg: 68 }
+  const height   = heights[size]
+  const fontSize = { sm: 18, md: 24, lg: 34 }[size]
+  const subSize  = { sm: 9,  md: 12, lg: 16 }[size]
 
-  // Navy bg logo for dark surfaces, white bg logo for light surfaces
-  const src = theme === 'light' ? '/logo-light.png' : '/logo.png'
+  const textColor = theme === 'light' ? B.navy : B.cream
+  const goldColor = B.gold
+
+  // On dark (navy) backgrounds invert the navy caddie to cream so it's visible
+  const iconFilter = theme === 'light' ? 'none' : 'brightness(0) saturate(100%) invert(93%) sepia(10%) saturate(300%) hue-rotate(10deg) brightness(95%)'
 
   return (
-    <img
-      src={src}
-      alt="First Loop"
-      style={{
-        height,
-        width: 'auto',
-        objectFit: 'contain',
-        display: 'block',
-      }}
-    />
+    <div style={{ display:'flex', alignItems:'center', gap: size === 'sm' ? 8 : 12 }}>
+      <img
+        src="/caddie-icon.png"
+        alt="First Loop caddie"
+        style={{
+          height,
+          width: 'auto',
+          objectFit: 'contain',
+          display: 'block',
+          filter: iconFilter,
+        }}
+      />
+      <div style={{ lineHeight: 1 }}>
+        <div style={{ fontFamily:"'Playfair Display', Georgia, serif", fontSize: subSize, fontWeight: 700, letterSpacing: '0.25em', color: goldColor, textTransform:'uppercase', marginBottom: 2 }}>
+          FIRST
+        </div>
+        <div style={{ fontFamily:"'Playfair Display', Georgia, serif", fontSize: fontSize, fontWeight: 900, color: textColor, letterSpacing: '-0.02em', lineHeight: 1 }}>
+          LOOP
+        </div>
+      </div>
+    </div>
   )
 }
 
