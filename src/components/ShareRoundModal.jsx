@@ -29,171 +29,165 @@ export default function ShareRoundModal({ round, course, onClose }) {
   const shareText = `Just played ${course?.name}${round?.score ? ` — shot ${round.score}` : ''}! I rated it ${round?.overall_rating?.toFixed(1)}/10 on First Loop 🏌️ Rate, rank & discover golf courses at firstloop.vercel.app`
   const shareUrl  = `${window.location.origin}/course/${course?.id}`
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas || !round || !course) return
+useEffect(() => {
+  const canvas = canvasRef.current
+  if (!canvas || !round || !course) return
 
-    try {
-      const ctx = canvas.getContext('2d')
-      const W = 600, H = 380
-      canvas.width  = W
-      canvas.height = H
+  try {
+    const ctx = canvas.getContext('2d')
+    const W = 600, H = 380
+    canvas.width  = W
+    canvas.height = H
 
-      // ── Background ──────────────────────────────────────
-      const bgColor = course.bg || B.navy
-      ctx.fillStyle = bgColor
-      ctx.fillRect(0, 0, W, H)
+    // Background
+    ctx.fillStyle = course.bg || B.navy
+    ctx.fillRect(0, 0, W, H)
 
-      // Dark gradient overlay
-      const grad = ctx.createLinearGradient(0, 0, 0, H)
-      grad.addColorStop(0, 'rgba(0,0,0,0.05)')
-      grad.addColorStop(1, 'rgba(0,0,0,0.4)')
-      ctx.fillStyle = grad
-      ctx.fillRect(0, 0, W, H)
+    // Dark overlay
+    const grad = ctx.createLinearGradient(0, 0, 0, H)
+    grad.addColorStop(0, 'rgba(0,0,0,0.05)')
+    grad.addColorStop(1, 'rgba(0,0,0,0.4)')
+    ctx.fillStyle = grad
+    ctx.fillRect(0, 0, W, H)
 
-      // Header strip
-      ctx.fillStyle = 'rgba(0,0,0,0.25)'
-      ctx.fillRect(0, 0, W, 78)
+    // Header strip
+    ctx.fillStyle = 'rgba(0,0,0,0.25)'
+    ctx.fillRect(0, 0, W, 78)
 
-      // ── Branding ─────────────────────────────────────────
-      ctx.textAlign  = 'right'
-      ctx.fillStyle  = B.gold
-      ctx.font       = 'bold 13px sans-serif'
-      ctx.fillText('FIRST LOOP', W - 22, 30)
-      ctx.fillStyle  = 'rgba(240,232,213,0.45)'
-      ctx.font       = '10px sans-serif'
-      ctx.fillText('firstloop.vercel.app', W - 22, 50)
-      ctx.textAlign  = 'left'
+    // Branding top right
+    ctx.textAlign = 'right'
+    ctx.fillStyle = B.gold
+    ctx.font      = 'bold 13px Arial, sans-serif'
+    ctx.fillText('FIRST LOOP', W - 22, 30)
+    ctx.fillStyle = 'rgba(240,232,213,0.5)'
+    ctx.font      = '10px Arial, sans-serif'
+    ctx.fillText('firstloop.vercel.app', W - 22, 50)
+    ctx.textAlign = 'left'
 
-      // ── Course name ──────────────────────────────────────
-      ctx.fillStyle = '#F0E8D5'
-      let fontSize  = 20
-      ctx.font      = `bold ${fontSize}px Georgia, serif`
-      const maxNameW = W - 200
-      while (ctx.measureText(course.name || '').width > maxNameW && fontSize > 13) {
-        fontSize--
-        ctx.font = `bold ${fontSize}px Georgia, serif`
-      }
-      ctx.fillText(course.name || '', 22, 34)
-
-      ctx.fillStyle = 'rgba(240,232,213,0.55)'
-      ctx.font      = '12px sans-serif'
-      ctx.fillText(`📍 ${course.location || ''}`, 22, 58)
-
-      // ── Section label ────────────────────────────────────
-      ctx.fillStyle    = B.gold
-      ctx.font         = 'bold 9px sans-serif'
-      ctx.letterSpacing = '2px'
-      ctx.fillText('MY ROUND', 22, 102)
-      ctx.letterSpacing = '0px'
-
-      // ── Score + My Rating + Course Rating boxes ──────────
-      const hasScore = round.score != null
-      const courseRating = course.rating || 0
-      const boxY = 112
-      const boxH = 86
-
-      // Calculate box widths
-      const totalBoxes = hasScore ? 3 : 2
-      const boxW   = Math.floor((W - 22 - (totalBoxes - 1) * 12 - 22) / totalBoxes)
-      const boxes  = []
-      if (hasScore) boxes.push({ label: 'SCORE',        value: round.score,                    color: '#F0E8D5', isScore: true })
-      boxes.push(    { label: 'MY RATING',   value: round.overall_rating?.toFixed(1), color: B.gold })
-      boxes.push(    { label: 'COURSE AVG',  value: courseRating > 0 ? courseRating.toFixed(1) : '—', color: '#a8d8b0', sub: `${course.reviews || 0} reviews` })
-
-      boxes.forEach((box, i) => {
-        const bx = 22 + i * (boxW + 12)
-
-        ctx.fillStyle = 'rgba(255,255,255,0.09)'
-        roundRect(ctx, bx, boxY, boxW, boxH, 10)
-
-        ctx.fillStyle  = box.color
-        ctx.font       = `bold 40px Georgia, serif`
-        ctx.textAlign  = 'center'
-        ctx.fillText(box.value, bx + boxW / 2, boxY + 52)
-
-        ctx.fillStyle    = 'rgba(240,232,213,0.45)'
-        ctx.font         = 'bold 8px sans-serif'
-        ctx.letterSpacing = '1px'
-        ctx.fillText(box.label, bx + boxW / 2, boxY + 70)
-        ctx.letterSpacing = '0px'
-
-        if (box.sub) {
-          ctx.fillStyle = 'rgba(240,232,213,0.3)'
-          ctx.font      = '8px sans-serif'
-          ctx.fillText(box.sub, bx + boxW / 2, boxY + 82)
-        }
-
-        ctx.textAlign = 'left'
-      })
-
-      // ── Rating bars ──────────────────────────────────────
-      const barData = [
-        ['CONDITIONS', round.conditions_rating, '#2a7a4a'],
-        ['VALUE',      round.value_rating,      '#3a5a8a'],
-        ['FACILITIES', round.vibes_rating,      B.gold],
-      ].filter(([, v]) => v != null)
-
-      const barStartY = boxY + boxH + 20
-
-      barData.forEach(([label, value, color], i) => {
-        const by = barStartY + i * 28
-
-        ctx.fillStyle    = 'rgba(240,232,213,0.4)'
-        ctx.font         = 'bold 8px sans-serif'
-        ctx.letterSpacing = '1px'
-        ctx.fillText(label, 22, by)
-        ctx.letterSpacing = '0px'
-
-        ctx.textAlign  = 'right'
-        ctx.fillStyle  = 'rgba(240,232,213,0.85)'
-        ctx.font       = 'bold 10px Georgia, serif'
-        ctx.fillText(value.toFixed(1), W - 22, by)
-        ctx.textAlign  = 'left'
-
-        // Track background
-        ctx.fillStyle = 'rgba(255,255,255,0.1)'
-        roundRect(ctx, 22, by + 6, W - 44, 5, 2)
-
-        // Filled track
-        ctx.fillStyle = color
-        roundRect(ctx, 22, by + 6, (W - 44) * (value / 10), 5, 2)
-      })
-
-      // ── Comment ──────────────────────────────────────────
-      if (round.comment) {
-        const cy = barStartY + barData.length * 28 + 14
-        if (cy < H - 28) {
-          ctx.fillStyle = 'rgba(240,232,213,0.5)'
-          ctx.font      = 'italic 11px sans-serif'
-          let comment   = `"${round.comment}"`
-          while (ctx.measureText(comment).width > W - 44 && comment.length > 10) {
-            comment = comment.slice(0, -4) + '..."'
-          }
-          ctx.fillText(comment, 22, cy)
-        }
-      }
-
-      // ── Footer line ──────────────────────────────────────
-      ctx.fillStyle = 'rgba(240,232,213,0.15)'
-      ctx.fillRect(0, H - 32, W, 1)
-      ctx.fillStyle  = 'rgba(240,232,213,0.25)'
-      ctx.font       = '10px sans-serif'
-      ctx.fillText('Rate · Rank · Discover', 22, H - 12)
-      ctx.textAlign  = 'right'
-      ctx.fillStyle  = B.gold
-      ctx.font       = 'bold 10px Georgia, serif'
-      ctx.fillText('FIRST LOOP', W - 22, H - 12)
-      ctx.textAlign  = 'left'
-
-      setImageUrl(canvas.toDataURL('image/png'))
-      setImgError(false)
-
-    } catch (err) {
-      console.error('Canvas error:', err)
-      setImgError(true)
+    // Course name
+    ctx.fillStyle = '#F0E8D5'
+    let fontSize  = 20
+    ctx.font      = `bold ${fontSize}px Georgia, serif`
+    while (ctx.measureText(course.name || '').width > W - 200 && fontSize > 13) {
+      fontSize--
+      ctx.font = `bold ${fontSize}px Georgia, serif`
     }
-  }, [round, course])
+    ctx.fillText(course.name || '', 22, 34)
+
+    ctx.fillStyle = 'rgba(240,232,213,0.55)'
+    ctx.font      = '12px Arial, sans-serif'
+    ctx.fillText((course.location || ''), 22, 58)
+
+    // Section label
+    ctx.fillStyle = B.gold
+    ctx.font      = 'bold 10px Arial, sans-serif'
+    ctx.fillText('MY ROUND', 22, 100)
+
+    // Score + My Rating + Course Avg boxes
+    const hasScore    = round.score != null
+    const courseRating = parseFloat(course.rating) || 0
+    const boxY = 112, boxH = 88
+    const totalBoxes  = hasScore ? 3 : 2
+    const gap  = 12
+    const boxW = Math.floor((W - 44 - (totalBoxes - 1) * gap) / totalBoxes)
+
+    const boxes = []
+    if (hasScore) boxes.push({ label:'SCORE',      value:String(round.score),                           color:'#F0E8D5' })
+    boxes.push(           { label:'MY RATING',  value:round.overall_rating?.toFixed(1) || '—',    color:B.gold })
+    boxes.push(           { label:'COURSE AVG', value:courseRating > 0 ? courseRating.toFixed(1) : '—', color:'#88ccaa',
+                            sub:`${course.reviews || 0} reviews` })
+
+    boxes.forEach((box, i) => {
+      const bx = 22 + i * (boxW + gap)
+
+      ctx.fillStyle = 'rgba(255,255,255,0.09)'
+      roundRect(ctx, bx, boxY, boxW, boxH, 10)
+
+      ctx.fillStyle = box.color
+      ctx.font      = 'bold 40px Georgia, serif'
+      ctx.textAlign = 'center'
+      ctx.fillText(box.value, bx + boxW / 2, boxY + 52)
+
+      ctx.fillStyle = 'rgba(240,232,213,0.5)'
+      ctx.font      = 'bold 9px Arial, sans-serif'
+      ctx.fillText(box.label, bx + boxW / 2, boxY + 70)
+
+      if (box.sub) {
+        ctx.fillStyle = 'rgba(240,232,213,0.3)'
+        ctx.font      = '8px Arial, sans-serif'
+        ctx.fillText(box.sub, bx + boxW / 2, boxY + 82)
+      }
+
+      ctx.textAlign = 'left'
+    })
+
+    // Rating bars
+    const barData = [
+      ['CONDITIONS', round.conditions_rating, '#2a7a4a'],
+      ['VALUE',      round.value_rating,      '#3a5a8a'],
+      ['FACILITIES', round.vibes_rating,      B.gold],
+    ].filter(([, v]) => v != null)
+
+    const barStartY = boxY + boxH + 22
+
+    barData.forEach(([label, value, color], i) => {
+      const by = barStartY + i * 28
+
+      ctx.fillStyle = 'rgba(240,232,213,0.4)'
+      ctx.font      = 'bold 9px Arial, sans-serif'
+      ctx.fillText(label, 22, by)
+
+      ctx.textAlign = 'right'
+      ctx.fillStyle = 'rgba(240,232,213,0.85)'
+      ctx.font      = 'bold 11px Georgia, serif'
+      ctx.fillText(value.toFixed(1), W - 22, by)
+      ctx.textAlign = 'left'
+
+      // Track
+      ctx.fillStyle = 'rgba(255,255,255,0.1)'
+      roundRect(ctx, 22, by + 6, W - 44, 5, 2)
+
+      // Fill
+      ctx.fillStyle = color
+      roundRect(ctx, 22, by + 6, Math.max(4, (W - 44) * (value / 10)), 5, 2)
+    })
+
+    // Comment
+    if (round.comment) {
+      const cy = barStartY + barData.length * 28 + 14
+      if (cy < H - 30) {
+        ctx.fillStyle = 'rgba(240,232,213,0.5)'
+        ctx.font      = 'italic 11px Arial, sans-serif'
+        let comment   = `"${round.comment}"`
+        while (ctx.measureText(comment).width > W - 44 && comment.length > 10) {
+          comment = comment.slice(0, -4) + '..."'
+        }
+        ctx.fillText(comment, 22, cy)
+      }
+    }
+
+    // Footer
+    ctx.fillStyle = 'rgba(240,232,213,0.15)'
+    ctx.fillRect(0, H - 32, W, 1)
+
+    ctx.fillStyle = 'rgba(240,232,213,0.3)'
+    ctx.font      = '10px Arial, sans-serif'
+    ctx.fillText('Rate · Rank · Discover', 22, H - 12)
+
+    ctx.textAlign = 'right'
+    ctx.fillStyle = B.gold
+    ctx.font      = 'bold 11px Georgia, serif'
+    ctx.fillText('FIRST LOOP', W - 22, H - 12)
+    ctx.textAlign = 'left'
+
+    setImageUrl(canvas.toDataURL('image/png'))
+    setImgError(false)
+
+  } catch (err) {
+    console.error('Canvas error:', err)
+    setImgError(true)
+  }
+}, [round, course])
 
   async function copyLink() {
     try {
