@@ -13,7 +13,6 @@ import Landing      from './pages/Landing.jsx'
 import SubmitCourse from './pages/SubmitCourse.jsx'
 import { useEffect, useState } from 'react'
 import Admin from './pages/Admin.jsx'
-import { useEffect } from 'react'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
