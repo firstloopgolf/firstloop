@@ -2,20 +2,23 @@ import { useState } from 'react'
 import { B, serif, sans } from '../lib/data.js'
 
 export function Logo({ size = 'md', theme = 'navy' }) {
-  const heights = { sm: 36, md: 48, lg: 72 }
+  const heights = { sm: 44, md: 56, lg: 80 }
   const height  = heights[size]
 
   return (
-    <img
-      src="/logo.png"
-      alt="First Loop"
-      style={{
-        height,
-        width: 'auto',
-        objectFit: 'contain',
-        display: 'block',
-      }}
-    />
+    <div style={{ display:'flex', alignItems:'center', height }}>
+      <img
+        src="/logo.png"
+        alt="First Loop"
+        style={{
+          height,
+          width: 'auto',
+          objectFit: 'contain',
+          display: 'block',
+          filter: 'brightness(0) invert(1)',
+        }}
+      />
+    </div>
   )
 }
 
