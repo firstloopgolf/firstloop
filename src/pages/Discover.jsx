@@ -51,7 +51,14 @@ export default function Discover() {
 
     // Sort
     list.sort((a, b) => {
-      if (sortBy === 'rating')  return parseFloat(b.rating || 0) - parseFloat(a.rating || 0)
+      if (sortBy === 'rating') {
+        const ratingDiff = parseFloat(b.rating || 0) - parseFloat(a.rating || 0)
+        if (ratingDiff !== 0) return ratingDiff
+        // Tiebreaker — nationally ranked courses float to top
+        const aNat = a.natRank < 999 ? a.natRank : 9999
+        const bNat = b.natRank < 999 ? b.natRank : 9999
+        return aNat - bNat
+      }
       if (sortBy === 'reviews') return (b.reviews || 0) - (a.reviews || 0)
       if (sortBy === 'name')    return a.name.localeCompare(b.name)
       if (sortBy === 'value')   return parseFloat(b.value || 0) - parseFloat(a.value || 0)

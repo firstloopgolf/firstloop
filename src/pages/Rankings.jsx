@@ -24,8 +24,12 @@ export default function Rankings() {
   const [tab, setTab]     = useState('national')
   const [state, setState] = useState('NY')
 
-  const nat = [...courses].sort((a,b) => a.natRank - b.natRank)
-  const st  = courses.filter(c => c.state===state).sort((a,b) => a.stRank - b.stRank)
+  const nat = courses
+    .filter(c => c.natRank <= 100)
+    .sort((a, b) => a.natRank - b.natRank)
+  const state = courses
+    .filter(c => c.stRank <= 20 && c.state === selectedState)
+    .sort((a, b) => a.stRank - b.stRank)
   const allStates = [...new Set(courses.map(c => c.state))].sort()
 
   return (

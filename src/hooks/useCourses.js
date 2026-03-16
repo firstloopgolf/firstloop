@@ -31,6 +31,7 @@ export function useCourse(id) {
     const { data } = await supabase
       .from('courses')
       .select('*')
+      .order('nat_rank', { ascending: true, nullsFirst: false })
       .eq('id', id)
       .single()
     setCourse(data ? normalizeCourse(data) : null)
