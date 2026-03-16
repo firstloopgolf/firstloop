@@ -63,5 +63,6 @@ function normalizeCourse(c) {
     stRank:     c.st_rank    || 99,
     icon:       c.icon       || '⛳',
     bg:         c.bg_color   || '#1B3054',
+    hasSeedRating: c.has_seed_rating || false,
   }
 }

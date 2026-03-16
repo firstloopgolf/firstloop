@@ -154,10 +154,19 @@ export default function CourseDetail() {
 
       {tab==='ratings' && (
         <div style={{ background:'#fff', borderRadius:16, padding:24, border:`1px solid ${B.border}` }}>
+          {course.hasSeedRating && rounds.length === 0 && (
+            <div style={{ background:'rgba(196,150,58,0.1)', border:`1px solid rgba(196,150,58,0.25)`, borderRadius:10, padding:'10px 14px', marginBottom:16, fontSize:12, color:'#8a6010', fontFamily:sans, lineHeight:1.6 }}>
+              <strong>✦ Editorial Rating</strong> — This course hasn't been reviewed on First Loop yet. The rating shown is a seed based on expert publications and course reputation. It will update automatically as community reviews come in.
+            </div>
+          )}
           <div style={{ textAlign:'center', marginBottom:24 }}>
             <div style={{ fontSize:52, fontWeight:900, color:B.gold, fontFamily:serif, lineHeight:1 }}>{avgRating}</div>
             <div style={{ fontSize:13, color:B.textSoft, fontFamily:sans, marginTop:4 }}>
-              {rounds.length > 0 ? `${rounds.length} First Loop ${rounds.length===1?'review':'reviews'}` : `${course.reviews.toLocaleString()} ratings`}
+              {rounds.length > 0
+                ? `${rounds.length} First Loop ${rounds.length===1?'review':'reviews'}`
+                : course.hasSeedRating
+                  ? '✦ Editorial seed rating'
+                  : 'No reviews yet'}
             </div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
