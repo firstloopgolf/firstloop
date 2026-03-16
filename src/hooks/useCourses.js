@@ -58,7 +58,7 @@ function normalizeCourse(c) {
     conditions: c.conditions || 0,
     value:      c.value_rating || 0,
     vibes:      c.vibes      || 0,
-    reviews:    c.review_count || 0,
+    reviews:    c.review_count ?? 0,
     natRank:    c.nat_rank   || 99,
     stRank:     c.st_rank    || 99,
     icon:       c.icon       || '⛳',

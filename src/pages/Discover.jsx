@@ -51,11 +51,11 @@ export default function Discover() {
 
     // Sort
     list.sort((a, b) => {
-      if (sortBy === 'rating')   return b.rating - a.rating
-      if (sortBy === 'reviews')  return b.reviews - a.reviews
-      if (sortBy === 'name')     return a.name.localeCompare(b.name)
-      if (sortBy === 'value')    return b.value - a.value
-      if (sortBy === 'newest')   return b.id - a.id
+      if (sortBy === 'rating')  return parseFloat(b.rating || 0) - parseFloat(a.rating || 0)
+      if (sortBy === 'reviews') return (b.reviews || 0) - (a.reviews || 0)
+      if (sortBy === 'name')    return a.name.localeCompare(b.name)
+      if (sortBy === 'value')   return parseFloat(b.value || 0) - parseFloat(a.value || 0)
+      if (sortBy === 'newest')  return b.id - a.id
       return 0
     })
 

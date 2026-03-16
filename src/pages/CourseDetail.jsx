@@ -106,10 +106,53 @@ export default function CourseDetail() {
           {loadingRounds ? (
             <div style={{ textAlign:'center', padding:'40px 0', color:B.textSoft, fontFamily:sans }}>Loading reviews...</div>
           ) : rounds.length === 0 ? (
-            <div style={{ textAlign:'center', padding:'40px 0', background:'#fff', borderRadius:16, border:`1px solid ${B.border}` }}>
-              <div style={{ fontSize:40, marginBottom:12 }}>⛳</div>
-              <div style={{ fontSize:16, fontWeight:700, color:B.textNavy, fontFamily:serif, marginBottom:6 }}>No reviews yet</div>
-              <div style={{ fontSize:13, color:B.textSoft, fontFamily:sans }}>Be the first to log a round here</div>
+            <div style={{ background:'#fff', borderRadius:16, border:`1px solid ${B.border}`, overflow:'hidden' }}>
+              {/* Hero banner */}
+              <div style={{ background:course.bg, padding:'28px 24px', textAlign:'center' }}>
+                <div style={{ fontSize:52, marginBottom:8 }}>{course.icon}</div>
+                <h3 style={{ color:B.cream, fontSize:20, fontWeight:900, fontFamily:serif, margin:'0 0 6px' }}>
+                  Be the First to Review
+                </h3>
+                <p style={{ color:'rgba(240,232,213,0.7)', fontSize:13, fontFamily:sans, margin:0, lineHeight:1.6 }}>
+                  {course.name} has no reviews yet on First Loop.<br/>Your review will be the one that starts it all.
+                </p>
+              </div>
+
+              {/* What gets rated */}
+              <div style={{ padding:'20px 24px', borderBottom:`1px solid ${B.feedBg}` }}>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10 }}>
+                  {[
+                    ['⛺', 'Conditions', 'Fairways, greens & upkeep'],
+                    ['💰', 'Value',      'Worth the green fee?'],
+                    ['🏌️', 'Facilities', 'Clubhouse & atmosphere'],
+                  ].map(([icon, label, desc]) => (
+                    <div key={label} style={{ textAlign:'center', padding:'12px 8px', background:B.feedBg, borderRadius:12 }}>
+                      <div style={{ fontSize:22, marginBottom:6 }}>{icon}</div>
+                      <div style={{ fontSize:12, fontWeight:700, color:B.textNavy, fontFamily:sans, marginBottom:3 }}>{label}</div>
+                      <div style={{ fontSize:10, color:B.textSoft, fontFamily:sans, lineHeight:1.4 }}>{desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div style={{ padding:'20px 24px', textAlign:'center' }}>
+                <p style={{ fontSize:13, color:B.textSoft, fontFamily:sans, margin:'0 0 16px', lineHeight:1.6 }}>
+                  Played {course.name}? Share your experience and help other golfers decide if it belongs on their bucket list.
+                </p>
+                <button onClick={() => user ? setShowModal(true) : navigate('/auth')}
+                  style={{ width:'100%', background:B.gold, color:B.navy, border:'none', borderRadius:12, padding:'14px 0', fontWeight:800, fontSize:15, cursor:'pointer', fontFamily:serif, marginBottom:10 }}>
+                  ⛳ Log Your Round Here
+                </button>
+                {!user && (
+                  <p style={{ fontSize:12, color:B.textSoft, fontFamily:sans, margin:0 }}>
+                    <span style={{ cursor:'pointer', color:B.navy, fontWeight:600, textDecoration:'underline' }} onClick={() => navigate('/auth')}>
+                      Create a free account
+                    </span>
+                    {' '}to start reviewing
+                  </p>
+                )}
+              </div>
             </div>
           ) : (
             <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
