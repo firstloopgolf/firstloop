@@ -13,7 +13,7 @@ export default function ShareRoundModal({ round, course, onClose }) {
   const courseAvg = parseFloat(course?.rating) || 0
   const hasScore  = round?.score != null
   const shareText = `Just played ${course?.name}${hasScore ? ` — shot ${round.score}` : ''}! I rated it ${myRating?.toFixed(1)}/10 on First Loop 🏌️ firstloop.vercel.app`
-  const shareUrl  = `${window.location.origin}/course/${course?.id}`
+  const shareUrl = `https://firstloopgolf.com/course/${course?.id}`
 
   const bgColor = course?.bg_color || course?.bg || B.navy
 
