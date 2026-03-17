@@ -52,6 +52,7 @@ export default function CourseSuggestions() {
       let query = supabase
         .from('courses')
         .select('*')
+        .eq('has_seed_rating', true)
         .order('rating', { ascending: false })
         .limit(6)
 
