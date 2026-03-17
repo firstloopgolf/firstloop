@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { B, serif, sans } from '../lib/data.js'
 import { CourseCard } from '../components/UI.jsx'
-import { useCourses } from '../hooks/useCourses.js'
+import { useTopCourses, useStateCourses, useCourseSearch } from '../hooks/useCourses.js'
 import CourseSuggestions from '../components/CourseSuggestions.jsx'
 
 const STATES = [
@@ -15,46 +15,48 @@ const STATES = [
 
 export default function Discover() {
   const navigate = useNavigate()
-  const { courses, loading } = useCourses()
 
-  const [q,        setQ]        = useState('')
-  const [state,    setState]    = useState('')
-  const [price,    setPrice]    = useState('')
-  const [access,   setAccess]   = useState('')
-  const [sortBy,   setSortBy]   = useState('rating')
+  const [q,           setQ]           = useState('')
+  const [state,       setState]       = useState('')
+  const [price,       setPrice]       = useState('')
+  const [access,      setAccess]      = useState('')
+  const [sortBy,      setSortBy]      = useState('rating')
   const [showFilters, setShowFilters] = useState(false)
+
+  // Decide which data source to use
+  const isSearching   = q.trim().length >= 2
+  const isStateFilter = !!state && !isSearching
+
+  const { courses: topCourses,   loading: loadingTop   } = useTopCourses()
+  const { courses: stateCourses, loading: loadingState } = useStateCourses(isStateFilter ? state : null)
+  const { results: searchResults, loading: loadingSearch } = useCourseSearch(isSearching ? q : '')
+
+  // Pick the right data source
+  const activeCourses = isSearching   ? searchResults
+                      : isStateFilter ? stateCourses
+                      : topCourses
+
+  const loading = isSearching   ? loadingSearch
+                : isStateFilter ? loadingState
+                : loadingTop
 
   const activeFilterCount = [state, price, access].filter(Boolean).length
 
   const filtered = useMemo(() => {
-    let list = [...courses]
+    let list = [...activeCourses]
 
-    // Text search
-    if (q) {
-      const lower = q.toLowerCase()
-      list = list.filter(c =>
-        c.name.toLowerCase().includes(lower) ||
-        c.location.toLowerCase().includes(lower) ||
-        c.state.toLowerCase().includes(lower)
-      )
-    }
-
-    // State filter
-    if (state) list = list.filter(c => c.state === state)
-
-    // Price filter
-    if (price) list = list.filter(c => c.price === price)
-
-    // Access filter
+    // Client-side filters on top of server results
+    if (price)  list = list.filter(c => c.price === price)
     if (access === 'public')  list = list.filter(c => c.price && c.price.length <= 2)
     if (access === 'private') list = list.filter(c => c.price && c.price.length >= 3)
 
-    // Sort
+    // State filter client-side only when searching
+    if (isSearching && state) list = list.filter(c => c.state === state)
+
     list.sort((a, b) => {
       if (sortBy === 'rating') {
         const ratingDiff = parseFloat(b.rating || 0) - parseFloat(a.rating || 0)
         if (ratingDiff !== 0) return ratingDiff
-        // Tiebreaker — nationally ranked courses float to top
         const aNat = a.natRank < 999 ? a.natRank : 9999
         const bNat = b.natRank < 999 ? b.natRank : 9999
         return aNat - bNat
@@ -67,7 +69,7 @@ export default function Discover() {
     })
 
     return list
-  }, [courses, q, state, price, access, sortBy])
+  }, [activeCourses, q, state, price, access, sortBy, isSearching])
 
   function clearFilters() {
     setState('')
@@ -106,6 +108,10 @@ export default function Discover() {
     width: '100%',
   }
 
+  const headerLabel = isSearching   ? `${filtered.length.toLocaleString()} results for "${q}"`
+                    : isStateFilter ? `${filtered.length.toLocaleString()} courses in ${state}`
+                    : 'Top 100 National'
+
   return (
     <div>
       {/* Hero Banner */}
@@ -116,7 +122,7 @@ export default function Discover() {
             Find Your Next<br/><span style={{ color: B.gold }}>Great Round</span>
           </h1>
           <p style={{ color: 'rgba(240,232,213,0.65)', margin: '0 0 16px', fontSize: 13, fontFamily: sans, lineHeight: 1.65 }}>
-            {courses.length.toLocaleString()} courses across America — rated by real golfers.
+            Thousands of courses across America — rated by real golfers.
           </p>
           {/* Search bar */}
           <div style={{ position: 'relative' }}>
@@ -139,8 +145,7 @@ export default function Discover() {
 
       {/* Filter toggle bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, overflowX: 'auto', paddingBottom: 2 }}>
-        <button
-          onClick={() => setShowFilters(!showFilters)}
+        <button onClick={() => setShowFilters(!showFilters)}
           style={{ ...pillBtn(showFilters || activeFilterCount > 0), display: 'flex', alignItems: 'center', gap: 6 }}>
           ⚙️ Filters {activeFilterCount > 0 && (
             <span style={{ background: B.gold, color: B.navy, borderRadius: 999, width: 18, height: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
@@ -149,7 +154,6 @@ export default function Discover() {
           )}
         </button>
 
-        {/* Quick sort pills */}
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto' }}>
           {[['rating','⭐ Top Rated'],['reviews','🔥 Most Reviewed'],['value','💰 Best Value'],['name','🔤 A-Z'],['newest','🆕 Newest']].map(([v, label]) => (
             <button key={v} onClick={() => setSortBy(v)} style={pillBtn(sortBy === v)}>{label}</button>
@@ -158,7 +162,7 @@ export default function Discover() {
 
         {activeFilterCount > 0 && (
           <button onClick={clearFilters}
-            style={{ flexShrink: 0, padding: '7px 14px', borderRadius: 999, border: `1.5px solid #fde8e8`, background: '#fde8e8', color: '#c00', fontWeight: 600, cursor: 'pointer', fontSize: 12, fontFamily: sans, whiteSpace: 'nowrap' }}>
+            style={{ flexShrink: 0, padding: '7px 14px', borderRadius: 999, border: '1.5px solid #fde8e8', background: '#fde8e8', color: '#c00', fontWeight: 600, cursor: 'pointer', fontSize: 12, fontFamily: sans, whiteSpace: 'nowrap' }}>
             Clear all
           </button>
         )}
@@ -166,10 +170,8 @@ export default function Discover() {
 
       {/* Expanded filter panel */}
       {showFilters && (
-        <div style={{ background: B.white, borderRadius: 16, padding: '18px 18px', marginBottom: 18, border: `1px solid ${B.border}` }}>
+        <div style={{ background: B.white, borderRadius: 16, padding: '18px', marginBottom: 18, border: `1px solid ${B.border}` }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
-
-            {/* State */}
             <div>
               <label style={{ fontSize: 11, fontWeight: 700, color: B.textMid, fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>State</label>
               <select value={state} onChange={e => setState(e.target.value)} style={selectStyle}>
@@ -177,8 +179,6 @@ export default function Discover() {
                 {STATES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
-
-            {/* Price */}
             <div>
               <label style={{ fontSize: 11, fontWeight: 700, color: B.textMid, fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Price Range</label>
               <select value={price} onChange={e => setPrice(e.target.value)} style={selectStyle}>
@@ -189,8 +189,6 @@ export default function Discover() {
                 <option value="$$$$">$$$$ — Luxury</option>
               </select>
             </div>
-
-            {/* Access */}
             <div>
               <label style={{ fontSize: 11, fontWeight: 700, color: B.textMid, fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Access</label>
               <select value={access} onChange={e => setAccess(e.target.value)} style={selectStyle}>
@@ -199,8 +197,6 @@ export default function Discover() {
                 <option value="private">Private / Semi</option>
               </select>
             </div>
-
-            {/* Sort (also in panel for mobile) */}
             <div>
               <label style={{ fontSize: 11, fontWeight: 700, color: B.textMid, fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Sort By</label>
               <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={selectStyle}>
@@ -211,21 +207,17 @@ export default function Discover() {
                 <option value="newest">Newest Added</option>
               </select>
             </div>
-
           </div>
         </div>
       )}
 
       {/* Results header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <div>
-          <span style={{ fontSize: 16, fontWeight: 700, color: B.textNavy, fontFamily: serif }}>
-            {q || activeFilterCount > 0 ? `${filtered.length.toLocaleString()} results` : 'Featured Courses'}
-          </span>
-          {state && <span style={{ fontSize: 13, color: B.textSoft, fontFamily: sans, marginLeft: 8 }}>in {state}</span>}
-        </div>
-        {filtered.length !== courses.length && (
-          <span style={{ fontSize: 12, color: B.textSoft, fontFamily: sans }}>of {courses.length.toLocaleString()} total</span>
+        <span style={{ fontSize: 16, fontWeight: 700, color: B.textNavy, fontFamily: serif }}>
+          {loading ? 'Loading...' : headerLabel}
+        </span>
+        {isSearching && q.trim().length < 2 && (
+          <span style={{ fontSize: 12, color: B.textSoft, fontFamily: sans }}>Type at least 2 characters to search</span>
         )}
       </div>
 
@@ -253,7 +245,8 @@ export default function Discover() {
           ))}
         </div>
       )}
+
       {!q && activeFilterCount === 0 && <CourseSuggestions />}
-    </div>  
+    </div>
   )
 }

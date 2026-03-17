@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { B, serif, sans } from '../lib/data.js'
-import { useCourses } from '../hooks/useCourses.js'
+import { useMapCourses } from '../hooks/useCourses.js'
 
 const STATES = [
   'AL','AZ','AR','CA','CO','FL','GA','ID','IL','IN',
@@ -12,7 +12,7 @@ const STATES = [
 
 export default function MapPage() {
   const navigate          = useNavigate()
-  const { courses }       = useCourses()
+const { courses }         = useMapCourses()
   const mapRef            = useRef(null)
   const mapInstanceRef    = useRef(null)
   const markersRef        = useRef([])
@@ -136,7 +136,11 @@ export default function MapPage() {
         <div style="font-family:'DM Sans',sans-serif;min-width:180px;padding:4px 0;">
           <div style="font-weight:700;font-size:13px;color:#1B3054;margin-bottom:3px;line-height:1.3;">${course.name}</div>
           <div style="font-size:11px;color:#7A8FA8;margin-bottom:6px;">📍 ${course.location}</div>
-          ${course.natRank < 999 ? `<div style="display:inline-block;background:#F5ECD6;color:#8a6010;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;margin-bottom:6px;">🏅 Natl #${course.natRank}</div>` : ''}
+          ${course.natRank < 999
+            ? `<div style="display:inline-block;background:#F5ECD6;color:#8a6010;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;margin-bottom:4px;">🏅 Natl #${course.natRank}</div><br/>`
+            : course.stRank < 999
+            ? `<div style="display:inline-block;background:#E8F0EB;color:#1E4530;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;margin-bottom:4px;">📍 State #${course.stRank}</div><br/>`
+            : ''}          
           ${course.rating > 0 ? `<div style="font-size:16px;font-weight:900;color:#C4963A;font-family:Georgia,serif;">★ ${course.rating.toFixed(1)}</div>` : ''}
           <button onclick="window.__firstloopNav('${course.id}')"
             style="margin-top:8px;width:100%;background:#1B3054;color:#F0E8D5;border:none;border-radius:8px;padding:7px 0;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
@@ -291,6 +295,7 @@ export default function MapPage() {
             <div style={{ fontSize:12, color:B.textSoft, fontFamily:sans }}>
               📍 {selectedCourse.location}
               {selectedCourse.natRank < 999 && ` · 🏅 Natl #${selectedCourse.natRank}`}
+              {selectedCourse.natRank >= 999 && selectedCourse.stRank < 999 && ` · State #${selectedCourse.stRank}`}
             </div>
           </div>
           <div style={{ textAlign:'right', flexShrink:0 }}>
