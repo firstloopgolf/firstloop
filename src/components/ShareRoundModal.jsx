@@ -12,7 +12,7 @@ export default function ShareRoundModal({ round, course, onClose }) {
   const myRating  = round?.overall_rating != null ? parseFloat(round.overall_rating) : null
   const courseAvg = parseFloat(course?.rating) || 0
   const hasScore  = round?.score != null
-  const shareText = `Just played ${course?.name}${hasScore ? ` — shot ${round.score}` : ''}! I rated it ${myRating?.toFixed(1)}/10 on First Loop 🏌️ firstloop.vercel.app`
+  const shareText = `Just played ${course?.name}${hasScore ? ` — shot ${round.score}` : ''}! I rated it ${myRating?.toFixed(1)}/10 on First Loop 🏌️ firstloopgolf.com`
   const shareUrl = `https://firstloopgolf.com/course/${course?.id}`
 
   const bgColor = course?.bg_color || course?.bg || B.navy
@@ -88,7 +88,7 @@ export default function ShareRoundModal({ round, course, onClose }) {
     ctx.fillText('FIRST LOOP', W - 18, 14)
     ctx.fillStyle = 'rgba(240,232,213,0.35)'
     ctx.font = '9px Arial, sans-serif'
-    ctx.fillText('firstloop.vercel.app', W - 18, 28)
+    ctx.fillText('firstloopgolf.com', W - 18, 28)
     ctx.textAlign = 'left'
 
     // MY ROUND label
