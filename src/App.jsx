@@ -11,8 +11,10 @@ import CourseDetail from './pages/CourseDetail.jsx'
 import Auth         from './pages/Auth.jsx'
 import Landing      from './pages/Landing.jsx'
 import SubmitCourse from './pages/SubmitCourse.jsx'
+import Onboarding   from './pages/Onboarding.jsx'
+import LogCourse    from './pages/LogCourse.jsx'
+import Admin        from './pages/Admin.jsx'
 import { useEffect, useState } from 'react'
-import Admin from './pages/Admin.jsx'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -24,55 +26,67 @@ function ProtectedRoute({ children }) {
 export default function App() {
   const navigate  = useNavigate()
   const location  = useLocation()
-  const { user, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()   // ← added profile
   const activeTab = location.pathname.split('/')[1] || 'discover'
-  const isAuth    = location.pathname === '/auth'
-  const isLanding = location.pathname === '/landing'
-  const hideNav   = isAuth || isLanding
+  const isAuth       = location.pathname === '/auth'
+  const isLanding    = location.pathname === '/landing'
+  const isOnboarding = location.pathname === '/onboarding'
+  const hideNav   = isAuth || isLanding || isOnboarding  // ← hide nav on onboarding
   const [installPrompt, setInstallPrompt] = useState(null)
   const [showIOSPrompt, setShowIOSPrompt] = useState(false)
 
-useEffect(() => {
-  const titles = {
-    discover: 'Discover Golf Courses | First Loop',
-    feed:     'Community Feed | First Loop',
-    rankings: 'Golf Course Rankings | First Loop',
-    map:      'Golf Course Map | First Loop',
-    profile:  'My Profile | First Loop',
-    submit:   'Submit a Course | First Loop',
+  // ── New user redirect to onboarding ───────────────────────────────────────
+  // If user is logged in but hasn't set a username yet, send them to onboarding
+  useEffect(() => {
+    if (
+      user &&
+      profile &&
+      !profile.username &&
+      !isOnboarding &&
+      !isAuth
+    ) {
+      navigate('/onboarding', { replace: true })
+    }
+  }, [user, profile, isOnboarding, isAuth])
+
+  useEffect(() => {
+    const titles = {
+      discover:   'Discover Golf Courses | First Loop',
+      feed:       'Community Feed | First Loop',
+      rankings:   'Golf Course Rankings | First Loop',
+      map:        'Golf Course Map | First Loop',
+      profile:    'My Profile | First Loop',
+      submit:     'Submit a Course | First Loop',
+      log:        'Log a Round | First Loop',
+      onboarding: 'Welcome | First Loop',
+    }
+    if (titles[activeTab]) document.title = titles[activeTab]
+  }, [activeTab])
+
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault()
+      setInstallPrompt(e)
+    })
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    const hasSeenPrompt = sessionStorage.getItem('iosPromptSeen')
+    if (isIOS && !isStandalone && !hasSeenPrompt) {
+      setTimeout(() => setShowIOSPrompt(true), 3000)
+    }
+  }, [])
+
+  async function handleInstall() {
+    if (!installPrompt) return
+    installPrompt.prompt()
+    const { outcome } = await installPrompt.userChoice
+    if (outcome === 'accepted') setInstallPrompt(null)
   }
-  if (titles[activeTab]) {
-    document.title = titles[activeTab]
+
+  function dismissIOSPrompt() {
+    sessionStorage.setItem('iosPromptSeen', 'true')
+    setShowIOSPrompt(false)
   }
-}, [activeTab])
-
-useEffect(() => {
-  // Android install prompt
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault()
-    setInstallPrompt(e)
-  })
-
-  // iOS prompt — show once per session if on iOS Safari
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-  const hasSeenPrompt = sessionStorage.getItem('iosPromptSeen')
-  if (isIOS && !isStandalone && !hasSeenPrompt) {
-    setTimeout(() => setShowIOSPrompt(true), 3000)
-  }
-}, [])
-
-async function handleInstall() {
-  if (!installPrompt) return
-  installPrompt.prompt()
-  const { outcome } = await installPrompt.userChoice
-  if (outcome === 'accepted') setInstallPrompt(null)
-}
-
-function dismissIOSPrompt() {
-  sessionStorage.setItem('iosPromptSeen', 'true')
-  setShowIOSPrompt(false)
-}
 
   const nav = (tab) => navigate(tab === 'discover' ? '/' : `/${tab}`)
 
@@ -109,16 +123,18 @@ function dismissIOSPrompt() {
 
       <div style={{ maxWidth:820, margin:'0 auto', padding: hideNav ? 0 : '22px 14px 96px' }}>
         <Routes>
-          <Route path="/"           element={user ? <Discover /> : <Landing />} />
-          <Route path="/discover"   element={<Discover />} />
-          <Route path="/feed"       element={<Feed />} />
-          <Route path="/rankings"   element={<Rankings />} />
-          <Route path="/map"        element={<MapPage />} />
-          <Route path="/auth"       element={<Auth />} />
-          <Route path="/course/:id" element={<CourseDetail />} />
-          <Route path="/submit"     element={<SubmitCourse />} />
-          <Route path="/profile"    element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/admin"      element={<Admin />} />
+          <Route path="/"            element={user ? <Discover /> : <Landing />} />
+          <Route path="/discover"    element={<Discover />} />
+          <Route path="/feed"        element={<Feed />} />
+          <Route path="/rankings"    element={<Rankings />} />
+          <Route path="/map"         element={<MapPage />} />
+          <Route path="/auth"        element={<Auth />} />
+          <Route path="/course/:id"  element={<CourseDetail />} />
+          <Route path="/submit"      element={<SubmitCourse />} />
+          <Route path="/onboarding"  element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+          <Route path="/log"         element={<ProtectedRoute><LogCourse /></ProtectedRoute>} />
+          <Route path="/profile"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/admin"       element={<Admin />} />
         </Routes>
       </div>
 
@@ -133,7 +149,8 @@ function dismissIOSPrompt() {
           ))}
         </div>
       )}
-    {/* Android install banner */}
+
+      {/* Android install banner */}
       {installPrompt && !hideNav && (
         <div style={{ position:'fixed', bottom:70, left:12, right:12, background:B.navy, borderRadius:16, padding:'14px 18px', display:'flex', alignItems:'center', gap:12, zIndex:400, boxShadow:'0 8px 32px rgba(0,0,0,0.3)', border:`1px solid rgba(196,150,58,0.3)` }}>
           <div style={{ fontSize:28 }}>⛳</div>
@@ -176,7 +193,7 @@ function dismissIOSPrompt() {
               </div>
               <div style={{ display:'flex', alignItems:'flex-start', gap:8, marginBottom:8 }}>
                 <span style={{ color:B.gold, fontWeight:700, flexShrink:0 }}>2.</span>
-                <span>Scroll down in the menu and tap <strong style={{ color:B.gold }}>"More & Add to Home Screen"</strong></span>
+                <span>Scroll down and tap <strong style={{ color:B.gold }}>"Add to Home Screen"</strong></span>
               </div>
               <div style={{ display:'flex', alignItems:'flex-start', gap:8 }}>
                 <span style={{ color:B.gold, fontWeight:700, flexShrink:0 }}>3.</span>
