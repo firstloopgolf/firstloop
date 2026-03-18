@@ -40,7 +40,7 @@ const isAdmin = profile?.is_admin === true
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: {
+    options: {   emailRedirectTo: 'https://www.firstloopgolf.com/onboarding',
       data: { username, full_name: fullName }
     }
   })
