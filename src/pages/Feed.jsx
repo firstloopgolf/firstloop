@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext.jsx'
 import { B, serif, sans } from '../lib/data.js'
 import { Avatar, NatBadge, PageBanner } from '../components/UI.jsx'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
+import RoundComments from '../components/RoundComments.jsx'
 
 // Convert stored rating (2–10) to emoji
 function ratingEmoji(v) {
@@ -274,6 +275,11 @@ export default function Feed() {
                     >
                       {liked[round.id] ? '♥' : '♡'}
                     </button>
+                  </div>
+
+                  {/* Comments */}
+                  <div style={{ marginTop: 10 }}>
+                    <RoundComments roundId={round.id}/>
                   </div>
                 </div>
               </div>

@@ -6,6 +6,7 @@ import { B, serif, sans } from '../lib/data.js'
 import { Avatar, RatingChip, RatingRow, NatBadge, StatBadge, TabBar } from '../components/UI.jsx'
 import { useCourse } from '../hooks/useCourses.js'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
+import RoundComments from '../components/RoundComments.jsx'
 
 export default function CourseDetail() {
   const { id }   = useParams()
@@ -184,6 +185,9 @@ export default function CourseDetail() {
                     style={{ background:'none', border:`1px solid ${B.border}`, borderRadius:999, padding:'4px 14px', cursor:'pointer', fontSize:12, color:B.textMid, fontFamily:sans, fontWeight:600, display:'flex', alignItems:'center', gap:5 }}>
                     📤 Share
                   </button>
+                </div>
+                <div style={{ marginTop: 10 }}>
+                  <RoundComments roundId={round.id}/>
                 </div>
                 </div>
               ))}
