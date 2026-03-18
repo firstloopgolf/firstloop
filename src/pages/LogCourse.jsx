@@ -432,7 +432,7 @@ export default function LogCourse() {
             <div>
               <div style={{ textAlign: 'center', marginBottom: 24 }}>
                 <div style={{ fontFamily: sans, fontSize: 11, fontWeight: 700, color: B.textSoft, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
-                  Comparison {compNum + 1} of {Math.min(3, prevRounds.length)}
+                    Comparison {Math.min(compNum + 1, Math.min(3, prevRounds.length))} of {Math.min(3, prevRounds.length)}
                 </div>
                 <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 16 }}>
                   {Array.from({ length: Math.min(3, prevRounds.length) }).map((_, i) => (
