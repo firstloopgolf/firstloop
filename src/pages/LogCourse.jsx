@@ -136,7 +136,14 @@ export default function LogCourse() {
       .eq('user_id', user.id)
       .order('elo_score', { ascending: false })
 
-    const rounds = prev || []
+    // Deduplicate — keep only highest Elo round per course
+    const seen = new Set()
+    const rounds = (prev || []).filter(r => {
+    const courseId = r.course_id
+    if (seen.has(courseId)) return false
+    seen.add(courseId)
+    return true
+    })
     setPrevRounds(rounds)
 
     if (rounds.length === 0) {
@@ -151,9 +158,15 @@ export default function LogCourse() {
     pickPair(scores, [], rounds)
   }
 
-  function pickPair(scores, done, rounds) {
-    const used = done.map(d => d.prevId)
-    const available = (rounds || prevRounds).filter(r => !used.includes(r.id))
+    function pickPair(scores, done, rounds) {
+    const usedRoundIds  = done.map(d => d.prevId)
+    const usedCourseIds = (rounds || prevRounds)
+        .filter(r => usedRoundIds.includes(r.id))
+        .map(r => r.courses?.id || r.course_id)
+    const available = (rounds || prevRounds).filter(r => 
+        !usedRoundIds.includes(r.id) && 
+        !usedCourseIds.includes(r.courses?.id || r.course_id)
+    )
     const total = Math.min(3, (rounds || prevRounds).length)
     if (available.length === 0 || done.length >= total) {
       setEloDone(true)
