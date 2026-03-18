@@ -29,8 +29,10 @@ export default function Auth() {
     try {
       if (mode === 'login') {
         await signIn(email, password)
+        navigate('/')
       } else {
         await signUp(email, password, username, fullName)
+        navigate('/onboarding')
       }
       navigate('/')
     } catch (err) {

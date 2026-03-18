@@ -26,7 +26,7 @@ function ProtectedRoute({ children }) {
 export default function App() {
   const navigate  = useNavigate()
   const location  = useLocation()
-  const { user, profile, signOut } = useAuth()   // ← added profile
+  const { user, profile, loading, signOut } = useAuth() 
   const activeTab = location.pathname.split('/')[1] || 'discover'
   const isAuth       = location.pathname === '/auth'
   const isLanding    = location.pathname === '/landing'
@@ -37,17 +37,18 @@ export default function App() {
 
   // ── New user redirect to onboarding ───────────────────────────────────────
   // If user is logged in but hasn't set a username yet, send them to onboarding
-  useEffect(() => {
-    if (
-      user &&
-      profile &&
-      !profile.username &&
-      !isOnboarding &&
-      !isAuth
-    ) {
-      navigate('/onboarding', { replace: true })
-    }
-  }, [user, profile, isOnboarding, isAuth])
+
+    useEffect(() => {
+      if (loading) return  // wait for auth to finish loading
+      if (
+        user &&
+        !isOnboarding &&
+        !isAuth &&
+        (!profile || !profile.username)  // catches null profile AND missing username
+      ) {
+        navigate('/onboarding', { replace: true })
+      }
+    }, [user, profile, loading, isOnboarding, isAuth])
 
   useEffect(() => {
     const titles = {
