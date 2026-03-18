@@ -35,20 +35,7 @@ export default function App() {
   const [installPrompt, setInstallPrompt] = useState(null)
   const [showIOSPrompt, setShowIOSPrompt] = useState(false)
 
-  // ── New user redirect to onboarding ───────────────────────────────────────
-  // If user is logged in but hasn't set a username yet, send them to onboarding
 
-    useEffect(() => {
-      if (loading) return  // wait for auth to finish loading
-      if (
-        user &&
-        !isOnboarding &&
-        !isAuth &&
-        (!profile || !profile.username)  // catches null profile AND missing username
-      ) {
-        navigate('/onboarding', { replace: true })
-      }
-    }, [user, profile, loading, isOnboarding, isAuth])
 
   useEffect(() => {
     const titles = {
