@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { B, serif, sans } from '../lib/data.js'
 import { Avatar, RatingChip, RatingRow, NatBadge, StatBadge, TabBar } from '../components/UI.jsx'
-import LogRoundModal from '../components/LogRoundModal.jsx'
 import { useCourse } from '../hooks/useCourses.js'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
 
@@ -16,7 +15,6 @@ export default function CourseDetail() {
 
   const [tab, setTab]             = useState('feed')
   const [rounds, setRounds]       = useState([])
-  const [showModal, setShowModal] = useState(false)
   const [loadingRounds, setLoadingRounds] = useState(true)
   const [shareRound, setShareRound] = useState(null)
 
@@ -70,7 +68,6 @@ export default function CourseDetail() {
 
   return (
     <div style={{ maxWidth:680, margin:'0 auto' }}>
-      {showModal && <LogRoundModal courseId={course.id} courseName={course.name} onClose={() => setShowModal(false)} onSuccess={fetchRounds}/>}
       {shareRound && <ShareRoundModal round={shareRound} course={course} onClose={() => setShareRound(null)}/>}
       <button onClick={() => navigate(-1)} style={{ background:'none', border:'none', color:B.textMid, cursor:'pointer', padding:'0 0 16px', fontSize:13, fontFamily:sans, fontWeight:600, display:'flex', alignItems:'center', gap:6 }}>← Back</button>
 
@@ -99,7 +96,7 @@ export default function CourseDetail() {
 
       {tab==='feed' && (
         <div>
-          <button onClick={() => user ? setShowModal(true) : navigate('/auth')}
+          <button onClick={() => user ? navigate('/log') : navigate('/auth')}
             style={{ width:'100%', background:B.gold, color:B.navy, border:'none', borderRadius:12, padding:'14px 0', fontWeight:800, fontSize:15, cursor:'pointer', marginBottom:14, fontFamily:serif }}>
             + Log Your Round Here
           </button>
@@ -140,7 +137,7 @@ export default function CourseDetail() {
                 <p style={{ fontSize:13, color:B.textSoft, fontFamily:sans, margin:'0 0 16px', lineHeight:1.6 }}>
                   Played {course.name}? Share your experience and help other golfers decide if it belongs on their bucket list.
                 </p>
-                <button onClick={() => user ? setShowModal(true) : navigate('/auth')}
+                <button onClick={() => user ? navigate('/log') : navigate('/auth')}
                   style={{ width:'100%', background:B.gold, color:B.navy, border:'none', borderRadius:12, padding:'14px 0', fontWeight:800, fontSize:15, cursor:'pointer', fontFamily:serif, marginBottom:10 }}>
                   ⛳ Log Your Round Here
                 </button>
