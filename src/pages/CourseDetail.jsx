@@ -96,7 +96,7 @@ export default function CourseDetail() {
 
       {tab==='feed' && (
         <div>
-          <button onClick={() => user ? navigate('/log') : navigate('/auth')}
+          <button onClick={() => user ? navigate('/log', { state: { courseId: course.id, courseName: course.name, courseIcon: course.icon, courseBg: course.bg, courseState: course.state } }) : navigate('/auth')}
             style={{ width:'100%', background:B.gold, color:B.navy, border:'none', borderRadius:12, padding:'14px 0', fontWeight:800, fontSize:15, cursor:'pointer', marginBottom:14, fontFamily:serif }}>
             + Log Your Round Here
           </button>
@@ -137,7 +137,7 @@ export default function CourseDetail() {
                 <p style={{ fontSize:13, color:B.textSoft, fontFamily:sans, margin:'0 0 16px', lineHeight:1.6 }}>
                   Played {course.name}? Share your experience and help other golfers decide if it belongs on their bucket list.
                 </p>
-                <button onClick={() => user ? navigate('/log') : navigate('/auth')}
+                <button onClick={() => user ? navigate('/log', { state: { courseId: course.id, courseName: course.name, courseIcon: course.icon, courseBg: course.bg, courseState: course.state } }) : navigate('/auth')}
                   style={{ width:'100%', background:B.gold, color:B.navy, border:'none', borderRadius:12, padding:'14px 0', fontWeight:800, fontSize:15, cursor:'pointer', fontFamily:serif, marginBottom:10 }}>
                   ⛳ Log Your Round Here
                 </button>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { B, serif, sans } from '../lib/data.js'
+import { useNavigate, useLocation } from 'react-router-dom'  // add useLocation
 
 // ── Elo helpers ───────────────────────────────────────────────────────────────
 const ELO_CONFIG = { default: 1500, k: 32, min: 800, max: 2800 }
@@ -94,6 +95,21 @@ export default function LogCourse() {
   const [finalRank,  setFinalRank]  = useState(null)
   const [saving,     setSaving]     = useState(false)
   const [error,      setError]      = useState('')
+
+  // ── Pre-populate course if coming from a course page ─────────────────────
+  const location = useLocation()
+  useEffect(() => {
+    if (location.state?.courseId) {
+      setSelectedCourse({
+        id:       location.state.courseId,
+        name:     location.state.courseName,
+        icon:     location.state.courseIcon,
+        bg_color: location.state.courseBg,
+        state:    location.state.courseState,
+      })
+      setStep(2)
+    }
+  }, [])
 
   // ── Course search ────────────────────────────────────────────────────────
   useEffect(() => {
