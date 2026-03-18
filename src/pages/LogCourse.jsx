@@ -192,13 +192,16 @@ export default function LogCourse() {
         newScores['new'] = newLoser
       }
       const newComps = [...comparisons, { prevId: prevRound.id, winnerId: winner === 'new' ? 'new' : prevRound.id, loserId: winner === 'new' ? prevRound.id : 'new' }]
-      setEloScores(newScores)
-      setComparisons(newComps)
-      setAnimating(null)
-      setCompNum(n => n + 1)
-      const total = Math.min(3, prevRounds.length)
-      if (newComps.length >= total) { setEloDone(true) }
-      else { pickPair(newScores, newComps, prevRounds) }
+        setEloScores(newScores)
+        setComparisons(newComps)
+        setAnimating(null)
+        const total = Math.min(3, prevRounds.length)
+        if (newComps.length >= total) {
+        setEloDone(true)  // don't increment compNum — screen is going away
+        } else {
+        setCompNum(n => n + 1)  // only increment if there's a next round to show
+        pickPair(newScores, newComps, prevRounds)
+        }
     }, 500)
   }
 
