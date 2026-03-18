@@ -72,6 +72,9 @@ export default function Feed() {
   const [rounds,     setRounds]     = useState([])
   const [loading,    setLoading]    = useState(true)
   const [liked,      setLiked]      = useState({})
+  const [likeCounts,  setLikeCounts]  = useState({})
+  const [likeUsers,   setLikeUsers]   = useState({})
+  const [showLikers,  setShowLikers]  = useState({})
   const [shareRound, setShareRound] = useState(null)  // ← was missing, caused bug
   const [shareCourse,setShareCourse]= useState(null)
 
@@ -119,26 +122,48 @@ export default function Feed() {
     if (!user || rounds.length === 0) return
     async function loadLikes() {
       const ids = rounds.map(r => r.id)
-      const { data } = await supabase
+
+      // Get current user's likes
+      const { data: myLikes } = await supabase
         .from('likes')
         .select('round_id')
         .eq('user_id', user.id)
         .in('round_id', ids)
       const map = {}
-      ;(data || []).forEach(l => { map[l.round_id] = true })
+      ;(myLikes || []).forEach(l => { map[l.round_id] = true })
       setLiked(map)
+
+      // Get all likes with names for counts + who liked
+      const { data: allLikes } = await supabase
+        .from('likes')
+        .select('round_id, profiles(username, full_name)')
+        .in('round_id', ids)
+      const counts = {}
+      const users  = {}
+      ;(allLikes || []).forEach(l => {
+        counts[l.round_id] = (counts[l.round_id] || 0) + 1
+        if (!users[l.round_id]) users[l.round_id] = []
+        users[l.round_id].push(l.profiles?.full_name || l.profiles?.username || 'Golfer')
+      })
+      setLikeCounts(counts)
+      setLikeUsers(users)
     }
     loadLikes()
   }, [rounds, user])
 
   async function toggleLike(roundId) {
     if (!user) { navigate('/auth'); return }
+    const userName = profile?.full_name || profile?.username || 'Golfer'
     if (liked[roundId]) {
       await supabase.from('likes').delete().eq('user_id', user.id).eq('round_id', roundId)
       setLiked(p => ({ ...p, [roundId]: false }))
+      setLikeCounts(p => ({ ...p, [roundId]: Math.max(0, (p[roundId] || 1) - 1) }))
+      setLikeUsers(p => ({ ...p, [roundId]: (p[roundId] || []).filter(n => n !== userName) }))
     } else {
       await supabase.from('likes').insert({ user_id: user.id, round_id: roundId })
       setLiked(p => ({ ...p, [roundId]: true }))
+      setLikeCounts(p => ({ ...p, [roundId]: (p[roundId] || 0) + 1 }))
+      setLikeUsers(p => ({ ...p, [roundId]: [...(p[roundId] || []), userName] }))
     }
   }
 
@@ -269,12 +294,32 @@ export default function Feed() {
                       </button>
                     </div>
 
-                    <button
-                      onClick={() => toggleLike(round.id)}
-                      style={{ background: 'none', border: `1px solid ${liked[round.id] ? B.gold : B.border}`, borderRadius: 999, padding: '5px 14px', cursor: 'pointer', fontSize: 14, color: liked[round.id] ? B.gold : B.textSoft, fontFamily: sans, transition: 'all 0.15s' }}
-                    >
-                      {liked[round.id] ? '♥' : '♡'}
-                    </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                      <button
+                        onClick={() => toggleLike(round.id)}
+                        style={{ background: 'none', border: `1px solid ${liked[round.id] ? B.gold : B.border}`, borderRadius: 999, padding: '5px 12px', cursor: 'pointer', fontSize: 13, color: liked[round.id] ? B.gold : B.textSoft, fontFamily: sans, transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 5 }}
+                      >
+                        {liked[round.id] ? '♥' : '♡'}
+                        {likeCounts[round.id] > 0 && (
+                          <span style={{ fontSize: 11, fontWeight: 700 }}>{likeCounts[round.id]}</span>
+                        )}
+                      </button>
+                      {likeCounts[round.id] > 0 && (
+                        <button
+                          onClick={() => setShowLikers(p => ({ ...p, [round.id]: !p[round.id] }))}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 10, color: B.textSoft, fontFamily: sans, padding: 0 }}
+                        >
+                          {showLikers[round.id] ? 'hide' : 'see who liked'}
+                        </button>
+                      )}
+                      {showLikers[round.id] && likeUsers[round.id]?.length > 0 && (
+                        <div style={{ fontSize: 11, color: B.textSoft, fontFamily: sans, textAlign: 'right', maxWidth: 160, lineHeight: 1.5 }}>
+                          {likeUsers[round.id].slice(0, 5).join(', ')}
+                          {likeUsers[round.id].length > 5 && ` +${likeUsers[round.id].length - 5} more`}
+                        </div>
+                      )}
+                    </div>
+
                   </div>
 
                   {/* Comments */}

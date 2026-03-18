@@ -16,6 +16,18 @@ export default function RoundComments({ roundId, initialCount = 0 }) {
   const [text,     setText]     = useState('')
   const [posting,  setPosting]  = useState(false)
 
+// Fetch count on mount so it shows before opening
+useEffect(() => {
+  async function fetchCount() {
+    const { count } = await supabase
+      .from('comments')
+      .select('*', { count: 'exact', head: true })
+      .eq('round_id', roundId)
+    setCount(count || 0)
+  }
+  fetchCount()
+}, [roundId])
+
   // Load comments when opened
   useEffect(() => {
     if (!open) return
