@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { B, serif, sans } from '../lib/data.js'
-import { useNavigate, useLocation } from 'react-router-dom'  // add useLocation
 
 // ── Elo helpers ───────────────────────────────────────────────────────────────
 const ELO_CONFIG = { default: 1500, k: 32, min: 800, max: 2800 }
@@ -58,23 +57,24 @@ function StepBar({ current, total }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function LogCourse() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user } = useAuth()
   const fileRef  = useRef(null)
 
   // ── Multi-step state ─────────────────────────────────────────────────────
-  const [step, setStep] = useState(1) // 1–5
+  const [step, setStep] = useState(1)
 
   // Step 1 — course search
-  const [search,       setSearch]       = useState('')
-  const [results,      setResults]      = useState([])
-  const [searching,    setSearching]    = useState(false)
-  const [selectedCourse, setSelectedCourse] = useState(null) // { id, name, icon, bg_color, state }
+  const [search,         setSearch]         = useState('')
+  const [results,        setResults]        = useState([])
+  const [searching,      setSearching]      = useState(false)
+  const [selectedCourse, setSelectedCourse] = useState(null)
 
   // Step 2 — details
-  const [playedAt, setPlayedAt] = useState(new Date().toISOString().split('T')[0])
-  const [score,    setScore]    = useState('')
-  const [note,     setNote]     = useState('')
-  const [photo,    setPhoto]    = useState(null)
+  const [playedAt,     setPlayedAt]     = useState(new Date().toISOString().split('T')[0])
+  const [score,        setScore]        = useState('')
+  const [note,         setNote]         = useState('')
+  const [photo,        setPhoto]        = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
 
   // Step 3 — Elo
@@ -92,20 +92,20 @@ export default function LogCourse() {
   const [vibes,      setVibes]      = useState(0)
 
   // Step 5 — result
-  const [finalRank,  setFinalRank]  = useState(null)
-  const [saving,     setSaving]     = useState(false)
-  const [error,      setError]      = useState('')
+  const [finalRank, setFinalRank] = useState(null)
+  const [saving,    setSaving]    = useState(false)
+  const [error,     setError]     = useState('')
 
-  // ── Pre-populate course if coming from a course page ─────────────────────
-  const location = useLocation()
+  // ── Pre-populate course if navigated from a course page ───────────────────
   useEffect(() => {
-    if (location.state?.courseId) {
+    const s = location.state
+    if (s?.courseId) {
       setSelectedCourse({
-        id:       location.state.courseId,
-        name:     location.state.courseName,
-        icon:     location.state.courseIcon,
-        bg_color: location.state.courseBg,
-        state:    location.state.courseState,
+        id:       s.courseId,
+        name:     s.courseName,
+        icon:     s.courseIcon,
+        bg_color: s.courseBg,
+        state:    s.courseState,
       })
       setStep(2)
     }
@@ -148,17 +148,17 @@ export default function LogCourse() {
   async function initElo() {
     const { data: prev } = await supabase
       .from('rounds')
-      .select('id, elo_score, personal_rank, courses(name, icon)')
+      .select('id, elo_score, personal_rank, course_id, courses(name, icon)')
       .eq('user_id', user.id)
       .order('elo_score', { ascending: false })
 
     // Deduplicate — keep only highest Elo round per course
     const seen = new Set()
     const rounds = (prev || []).filter(r => {
-    const courseId = r.course_id
-    if (seen.has(courseId)) return false
-    seen.add(courseId)
-    return true
+      const cId = r.course_id
+      if (seen.has(cId)) return false
+      seen.add(cId)
+      return true
     })
     setPrevRounds(rounds)
 
@@ -174,14 +174,14 @@ export default function LogCourse() {
     pickPair(scores, [], rounds)
   }
 
-    function pickPair(scores, done, rounds) {
+  function pickPair(scores, done, rounds) {
     const usedRoundIds  = done.map(d => d.prevId)
     const usedCourseIds = (rounds || prevRounds)
-        .filter(r => usedRoundIds.includes(r.id))
-        .map(r => r.courses?.id || r.course_id)
-    const available = (rounds || prevRounds).filter(r => 
-        !usedRoundIds.includes(r.id) && 
-        !usedCourseIds.includes(r.courses?.id || r.course_id)
+      .filter(r => usedRoundIds.includes(r.id))
+      .map(r => r.course_id)
+    const available = (rounds || prevRounds).filter(r =>
+      !usedRoundIds.includes(r.id) &&
+      !usedCourseIds.includes(r.course_id)
     )
     const total = Math.min(3, (rounds || prevRounds).length)
     if (available.length === 0 || done.length >= total) {
@@ -207,21 +207,25 @@ export default function LogCourse() {
         newScores[prevRound.id] = newWinner
         newScores['new'] = newLoser
       }
-      const newComps = [...comparisons, { prevId: prevRound.id, winnerId: winner === 'new' ? 'new' : prevRound.id, loserId: winner === 'new' ? prevRound.id : 'new' }]
-        setEloScores(newScores)
-        setComparisons(newComps)
-        setAnimating(null)
-        const total = Math.min(3, prevRounds.length)
-        if (newComps.length >= total) {
-        setEloDone(true)  // don't increment compNum — screen is going away
-        } else {
-        setCompNum(n => n + 1)  // only increment if there's a next round to show
+      const newComps = [...comparisons, {
+        prevId:   prevRound.id,
+        winnerId: winner === 'new' ? 'new' : prevRound.id,
+        loserId:  winner === 'new' ? prevRound.id : 'new',
+      }]
+      setEloScores(newScores)
+      setComparisons(newComps)
+      setAnimating(null)
+      const total = Math.min(3, prevRounds.length)
+      if (newComps.length >= total) {
+        setEloDone(true)
+      } else {
+        setCompNum(n => n + 1)
         pickPair(newScores, newComps, prevRounds)
-        }
+      }
     }, 500)
   }
 
-  // ── Save round (called from step 4 submit) ───────────────────────────────
+  // ── Save round ────────────────────────────────────────────────────────────
   async function saveRound() {
     setSaving(true)
     setError('')
@@ -232,7 +236,6 @@ export default function LogCourse() {
         : null
       const finalElo = eloScores['new'] || ELO_CONFIG.default
 
-      // 1. Insert round
       const { data: newRound, error: insertErr } = await supabase.from('rounds').insert({
         user_id:           user.id,
         course_id:         selectedCourse.id,
@@ -248,14 +251,12 @@ export default function LogCourse() {
       }).select().single()
       if (insertErr) throw insertErr
 
-      // 2. Update compared rounds' Elo scores
       for (const comp of comparisons) {
         if (comp.prevId !== 'new') {
           await supabase.from('rounds').update({ elo_score: eloScores[comp.prevId] }).eq('id', comp.prevId)
         }
       }
 
-      // 3. Save comparison history
       for (const comp of comparisons) {
         await supabase.from('elo_comparisons').insert({
           user_id:         user.id,
@@ -264,7 +265,6 @@ export default function LogCourse() {
         })
       }
 
-      // 4. Recalculate all personal ranks
       const { data: allRounds } = await supabase.from('rounds')
         .select('id, elo_score').eq('user_id', user.id).order('elo_score', { ascending: false })
       if (allRounds) {
@@ -275,7 +275,6 @@ export default function LogCourse() {
         setFinalRank(myRank)
       }
 
-      // 5. Update course community Elo
       const { data: courseRounds } = await supabase.from('rounds').select('elo_score').eq('course_id', selectedCourse.id)
       if (courseRounds && courseRounds.length > 0) {
         const avg = Math.round(courseRounds.reduce((s, r) => s + (r.elo_score || 1500), 0) / courseRounds.length)
@@ -296,7 +295,6 @@ export default function LogCourse() {
     color: B.textNavy, outline: 'none', background: '#fff', boxSizing: 'border-box',
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
   return (
     <div style={{ minHeight: '100vh' }}>
 
@@ -304,12 +302,8 @@ export default function LogCourse() {
       {step === 1 && (
         <div>
           <div style={{ background: B.navy, borderRadius: 20, padding: '24px 20px', marginBottom: 20 }}>
-            <h1 style={{ fontFamily: serif, fontSize: 24, fontWeight: 900, color: B.cream, margin: '0 0 6px' }}>
-              Log a Round
-            </h1>
-            <p style={{ fontFamily: sans, fontSize: 13, color: 'rgba(240,232,213,0.6)', margin: '0 0 16px' }}>
-              Which course did you play?
-            </p>
+            <h1 style={{ fontFamily: serif, fontSize: 24, fontWeight: 900, color: B.cream, margin: '0 0 6px' }}>Log a Round</h1>
+            <p style={{ fontFamily: sans, fontSize: 13, color: 'rgba(240,232,213,0.6)', margin: '0 0 16px' }}>Which course did you play?</p>
             <input
               value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search by course name..."
@@ -318,9 +312,7 @@ export default function LogCourse() {
             />
           </div>
 
-          {searching && (
-            <div style={{ textAlign: 'center', padding: '16px', fontFamily: sans, fontSize: 13, color: B.textSoft }}>Searching...</div>
-          )}
+          {searching && <div style={{ textAlign: 'center', padding: '16px', fontFamily: sans, fontSize: 13, color: B.textSoft }}>Searching...</div>}
 
           {results.length > 0 && (
             <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: `1px solid ${B.border}` }}>
@@ -343,9 +335,7 @@ export default function LogCourse() {
 
           {search.length >= 2 && !searching && results.length === 0 && (
             <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: `1px solid ${B.border}`, textAlign: 'center' }}>
-              <div style={{ fontSize: 13, color: B.textSoft, fontFamily: sans, marginBottom: 12 }}>
-                Can't find "{search}"?
-              </div>
+              <div style={{ fontSize: 13, color: B.textSoft, fontFamily: sans, marginBottom: 12 }}>Can't find "{search}"?</div>
               <button onClick={() => navigate('/submit')}
                 style={{ background: B.navy, color: B.cream, border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: sans }}>
                 + Submit this course
@@ -366,15 +356,14 @@ export default function LogCourse() {
       {step === 2 && selectedCourse && (
         <div>
           <StepBar current={1} total={4}/>
-
-          {/* Course header */}
           <div style={{ background: selectedCourse.bg_color || B.navy, borderRadius: 16, padding: '16px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ fontSize: 32 }}>{selectedCourse.icon || '⛳'}</div>
             <div>
               <div style={{ fontFamily: serif, fontSize: 16, fontWeight: 900, color: B.cream }}>{selectedCourse.name}</div>
               <div style={{ fontFamily: sans, fontSize: 12, color: 'rgba(240,232,213,0.6)' }}>{selectedCourse.state}</div>
             </div>
-            <button onClick={() => setStep(1)} style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 8, padding: '6px 10px', color: 'rgba(240,232,213,0.6)', fontSize: 12, cursor: 'pointer', fontFamily: sans }}>
+            <button onClick={() => setStep(1)}
+              style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 8, padding: '6px 10px', color: 'rgba(240,232,213,0.6)', fontSize: 12, cursor: 'pointer', fontFamily: sans }}>
               Change
             </button>
           </div>
@@ -409,9 +398,7 @@ export default function LogCourse() {
               <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden' }}>
                 <img src={photoPreview} alt="Preview" style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block' }}/>
                 <button type="button" onClick={() => { setPhoto(null); setPhotoPreview(null) }}
-                  style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: '50%', width: 30, height: 30, cursor: 'pointer', color: '#fff', fontSize: 14 }}>
-                  ✕
-                </button>
+                  style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: '50%', width: 30, height: 30, cursor: 'pointer', color: '#fff', fontSize: 14 }}>✕</button>
               </div>
             ) : (
               <button type="button" onClick={() => fileRef.current?.click()}
@@ -434,7 +421,6 @@ export default function LogCourse() {
       {step === 3 && (
         <div>
           <StepBar current={2} total={4}/>
-
           {eloDone ? (
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
@@ -451,7 +437,7 @@ export default function LogCourse() {
             <div>
               <div style={{ textAlign: 'center', marginBottom: 24 }}>
                 <div style={{ fontFamily: sans, fontSize: 11, fontWeight: 700, color: B.textSoft, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
-                    Comparison {Math.min(compNum + 1, Math.min(3, prevRounds.length))} of {Math.min(3, prevRounds.length)}
+                  Comparison {Math.min(compNum + 1, Math.min(3, prevRounds.length))} of {Math.min(3, prevRounds.length)}
                 </div>
                 <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 16 }}>
                   {Array.from({ length: Math.min(3, prevRounds.length) }).map((_, i) => (
@@ -463,15 +449,14 @@ export default function LogCourse() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'center' }}>
-                {/* New course */}
                 <button type="button" onClick={() => handleEloChoice('new')}
                   style={{
-                    background: animating === 'new' ? `${B.green}20` : animating ? 'rgba(0,0,0,0.02)' : B.navy,
-                    border: `2px solid ${animating === 'new' ? B.green : B.navy}`,
+                    background:   animating === 'new' ? `${B.green}20` : animating ? 'rgba(0,0,0,0.02)' : B.navy,
+                    border:       `2px solid ${animating === 'new' ? B.green : B.navy}`,
                     borderRadius: 18, padding: '24px 12px', cursor: 'pointer', textAlign: 'center',
-                    transition: 'all 0.3s',
-                    transform: animating === 'new' ? 'scale(1.06)' : animating ? 'scale(0.93)' : 'scale(1)',
-                    opacity: animating && animating !== 'new' ? 0.35 : 1,
+                    transition:   'all 0.3s',
+                    transform:    animating === 'new' ? 'scale(1.06)' : animating ? 'scale(0.93)' : 'scale(1)',
+                    opacity:      animating && animating !== 'new' ? 0.35 : 1,
                   }}>
                   <div style={{ fontSize: 36, marginBottom: 10 }}>{selectedCourse?.icon || '⛳'}</div>
                   <div style={{ fontFamily: serif, fontSize: 13, fontWeight: 800, color: B.cream, lineHeight: 1.4 }}>{selectedCourse?.name}</div>
@@ -480,15 +465,14 @@ export default function LogCourse() {
 
                 <div style={{ fontFamily: serif, fontSize: 12, fontWeight: 900, color: B.textSoft, background: B.feedBg, borderRadius: 8, padding: '6px 8px', border: `1px solid ${B.border}` }}>VS</div>
 
-                {/* Previous course */}
                 <button type="button" onClick={() => handleEloChoice(currentPair.b.id)}
                   style={{
-                    background: animating === currentPair.b.id ? `${B.green}20` : animating ? 'rgba(0,0,0,0.02)' : '#fff',
-                    border: `2px solid ${animating === currentPair.b.id ? B.green : B.border}`,
+                    background:   animating === currentPair.b.id ? `${B.green}20` : animating ? 'rgba(0,0,0,0.02)' : '#fff',
+                    border:       `2px solid ${animating === currentPair.b.id ? B.green : B.border}`,
                     borderRadius: 18, padding: '24px 12px', cursor: 'pointer', textAlign: 'center',
-                    transition: 'all 0.3s',
-                    transform: animating === currentPair.b.id ? 'scale(1.06)' : animating ? 'scale(0.93)' : 'scale(1)',
-                    opacity: animating && animating !== currentPair.b.id ? 0.35 : 1,
+                    transition:   'all 0.3s',
+                    transform:    animating === currentPair.b.id ? 'scale(1.06)' : animating ? 'scale(0.93)' : 'scale(1)',
+                    opacity:      animating && animating !== currentPair.b.id ? 0.35 : 1,
                   }}>
                   <div style={{ fontSize: 36, marginBottom: 10 }}>{currentPair.b.courses?.icon || '⛳'}</div>
                   <div style={{ fontFamily: serif, fontSize: 13, fontWeight: 800, color: B.textNavy, lineHeight: 1.4 }}>{currentPair.b.courses?.name || 'Previous Course'}</div>
@@ -532,9 +516,7 @@ export default function LogCourse() {
             </div>
           ))}
 
-          <button
-            onClick={saveRound}
-            disabled={saving || !conditions || !value || !vibes}
+          <button onClick={saveRound} disabled={saving || !conditions || !value || !vibes}
             style={{
               width: '100%', marginTop: 8,
               background: (!conditions || !value || !vibes) ? B.border : saving ? B.border : B.gold,
@@ -552,42 +534,20 @@ export default function LogCourse() {
       {step === 5 && selectedCourse && (
         <div style={{ textAlign: 'center' }}>
           <StepBar current={4} total={4}/>
-
-          {/* The share card */}
-          <div style={{
-            background: B.navy, borderRadius: 24, padding: '32px 24px',
-            marginBottom: 24, position: 'relative', overflow: 'hidden',
-          }}>
-            {/* Background decoration */}
+          <div style={{ background: B.navy, borderRadius: 24, padding: '32px 24px', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(196,150,58,0.08)' }}/>
             <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(196,150,58,0.05)' }}/>
-
-            {/* First Loop branding */}
-            <div style={{ fontFamily: serif, fontSize: 11, fontWeight: 700, color: 'rgba(240,232,213,0.35)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 20 }}>
-              FIRST LOOP
-            </div>
-
-            {/* Course name */}
-            <div style={{ fontFamily: serif, fontSize: 22, fontWeight: 900, color: B.cream, lineHeight: 1.3, marginBottom: 16 }}>
-              {selectedCourse.name}
-            </div>
-
-            {/* Rank reveal */}
+            <div style={{ fontFamily: serif, fontSize: 11, fontWeight: 700, color: 'rgba(240,232,213,0.35)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 20 }}>FIRST LOOP</div>
+            <div style={{ fontFamily: serif, fontSize: 22, fontWeight: 900, color: B.cream, lineHeight: 1.3, marginBottom: 16 }}>{selectedCourse.name}</div>
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(240,232,213,0.4)', fontFamily: sans, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>
-                Ranked in my list
-              </div>
-              <div style={{ fontSize: 80, fontWeight: 900, color: B.gold, fontFamily: serif, lineHeight: 1 }}>
-                #{finalRank || '—'}
-              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(240,232,213,0.4)', fontFamily: sans, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Ranked in my list</div>
+              <div style={{ fontSize: 80, fontWeight: 900, color: B.gold, fontFamily: serif, lineHeight: 1 }}>#{finalRank || '—'}</div>
             </div>
-
-            {/* 3-axis emojis */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 16 }}>
               {[
-                { label: 'Conditions', val: conditions, emoji: EMOJIS[conditions] },
-                { label: 'Value',      val: value,      emoji: EMOJIS[value]      },
-                { label: 'Vibes',      val: vibes,      emoji: EMOJIS[vibes]      },
+                { label: 'Conditions', emoji: EMOJIS[conditions] },
+                { label: 'Value',      emoji: EMOJIS[value]      },
+                { label: 'Vibes',      emoji: EMOJIS[vibes]      },
               ].map(({ label, emoji }) => (
                 <div key={label} style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: 28, marginBottom: 4 }}>{emoji}</div>
@@ -595,28 +555,17 @@ export default function LogCourse() {
                 </div>
               ))}
             </div>
-
-            {/* Score if logged */}
             {score && (
               <div style={{ fontFamily: sans, fontSize: 13, color: 'rgba(240,232,213,0.5)', marginTop: 8 }}>
                 Scored {score} · {new Date(playedAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </div>
             )}
-
-            {/* firstloopgolf.com */}
-            <div style={{ marginTop: 20, fontFamily: sans, fontSize: 11, color: 'rgba(240,232,213,0.25)', letterSpacing: '0.05em' }}>
-              firstloopgolf.com
-            </div>
+            <div style={{ marginTop: 20, fontFamily: sans, fontSize: 11, color: 'rgba(240,232,213,0.25)', letterSpacing: '0.05em' }}>firstloopgolf.com</div>
           </div>
 
-          {/* Action buttons */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <button
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({ title: `${selectedCourse.name} — #${finalRank} in my list`, text: `Just logged ${selectedCourse.name} on First Loop. Ranked #${finalRank} in my personal list. Check it out at firstloopgolf.com`, url: 'https://firstloopgolf.com' })
-                }
-              }}
+              onClick={() => navigator.share && navigator.share({ title: `${selectedCourse.name} — #${finalRank} in my list`, text: `Just logged ${selectedCourse.name} on First Loop. Ranked #${finalRank} in my personal list. firstloopgolf.com`, url: 'https://firstloopgolf.com' })}
               style={{ width: '100%', background: B.gold, color: B.navy, border: 'none', borderRadius: 12, padding: '14px 0', fontWeight: 900, fontSize: 15, cursor: 'pointer', fontFamily: serif }}>
               📤 Share Your Round
             </button>
