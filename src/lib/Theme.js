@@ -17,6 +17,7 @@ export const lightColors = {
   gold:       '#c9a84c',
   goldLight:  '#e8c96d',
   goldPale:   '#f5edd6',
+  goldPaleText: '#8a6010',  // text on gold pale in light mode
   cream:      '#f5f0e8',
   creamDark:  '#ede8de',
   white:      '#ffffff',
@@ -36,7 +37,8 @@ export const darkColors = {
   greenLight: '#6db562',
   gold:       '#c9a84c',
   goldLight:  '#e8c96d',
-  goldPale:   'rgba(201,168,76,0.12)',
+  goldPale:   'rgba(201,168,76,0.25)',  // more opaque in dark mode
+  goldPaleText: '#e8c96d',               // text on gold pale in dark mode
   cream:      '#e8e4da',
   creamDark:  '#1a261a',
   white:      '#1a261a',

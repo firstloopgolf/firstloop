@@ -41,8 +41,8 @@ export function Logo({ size = 'md', theme = 'navy' }) {
 
 export function Pill({ children, gold, green, small }) {
   const { B, serif, sans } = useTheme()
-  const bg = gold ? B.goldPale : green ? '#E0EDE5' : '#E5EAF5'
-  const fg = gold ? '#8a6010'  : green ? B.green    : B.navy
+  const bg = gold ? B.goldPale  : green ? 'rgba(74,144,64,0.2)' : 'rgba(74,144,64,0.15)'
+  const fg = gold ? (B.goldPaleText || '#8a6010') : green ? B.greenLight : B.greenLight
   return (
     <span style={{ display:'inline-flex', alignItems:'center', gap:3, background:bg, color:fg, padding:small ? '2px 8px':'3px 12px', borderRadius:999, fontSize:small ? 10:11, fontWeight:700, fontFamily:sans, whiteSpace:'nowrap' }}>
       {children}
