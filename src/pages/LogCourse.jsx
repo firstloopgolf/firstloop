@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 
 // ── Elo helpers ───────────────────────────────────────────────────────────────
 const ELO_CONFIG = { default: 1500, k: 32, min: 800, max: 2800 }
@@ -56,6 +56,7 @@ function StepBar({ current, total }) {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function LogCourse() {
+  const { B, serif, sans } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
   const { user } = useAuth()

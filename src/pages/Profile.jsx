@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { B, serif, sans, COURSES } from '../lib/data.js'
+import { COURSES } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 import { Pill } from '../components/UI.jsx'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
 import CourseSuggestions from '../components/CourseSuggestions.jsx'
 
 export default function Profile() {
+  const { B, serif, sans } = useTheme()
   const navigate                    = useNavigate()
   const { user, profile, signOut, fetchProfile, isAdmin } = useAuth()
   const [tab, setTab]               = useState('rounds')

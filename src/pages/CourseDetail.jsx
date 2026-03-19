@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 import { Avatar, RatingChip, RatingRow, NatBadge, StatBadge, TabBar } from '../components/UI.jsx'
 import { useCourse } from '../hooks/useCourses.js'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
 import RoundComments from '../components/RoundComments.jsx'
 
 export default function CourseDetail() {
+  const { B, serif, sans } = useTheme()
   const { id }   = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -34,7 +35,6 @@ export default function CourseDetail() {
         document.title = 'First Loop — Rate, Rank & Discover Golf Courses'
       }
     }, [course])
-
 
   async function fetchRounds() {
     setLoadingRounds(true)

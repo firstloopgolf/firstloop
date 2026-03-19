@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 
 export default function ShareRoundModal({ round, course, onClose }) {
+  const { B, serif, sans } = useTheme()
   const canvasRef              = useRef(null)
   const [copied, setCopied]    = useState(false)
   const [saving, setSaving]    = useState(false)
@@ -15,7 +16,7 @@ export default function ShareRoundModal({ round, course, onClose }) {
   const shareText = `Just played ${course?.name}${hasScore ? ` — shot ${round.score}` : ''}! I rated it ${myRating?.toFixed(1)}/10 on First Loop 🏌️ firstloopgolf.com`
   const shareUrl = `https://firstloopgolf.com/course/${course?.id}`
 
-  const bgColor = course?.bg_color || course?.bg || B.navy
+  const bgColor = course?.bg_color || course?.bg || '#1a2e1a'
 
   const barData = [
     { label: 'CONDITIONS', value: round?.conditions_rating, color: '#2a8a5a' },

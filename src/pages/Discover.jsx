@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 import { CourseCard } from '../components/UI.jsx'
 import { useTopCourses, useStateCourses, useCourseSearch } from '../hooks/useCourses.js'
 import CourseSuggestions from '../components/CourseSuggestions.jsx'
@@ -14,6 +14,7 @@ const STATES = [
 ]
 
 export default function Discover() {
+  const { B, serif, sans } = useTheme()
   const navigate = useNavigate()
 
   const [q,           setQ]           = useState('')

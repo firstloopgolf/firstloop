@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 
 export function Logo({ size = 'md', theme = 'navy' }) {
+  const { B, serif, sans } = useTheme()
   const heights  = { sm: 36, md: 48, lg: 68 }
   const height   = heights[size]
   const fontSize = { sm: 18, md: 24, lg: 34 }[size]
@@ -27,10 +28,10 @@ export function Logo({ size = 'md', theme = 'navy' }) {
         }}
       />
       <div style={{ lineHeight: 1 }}>
-        <div style={{ fontFamily:"'Playfair Display', Georgia, serif", fontSize: subSize, fontWeight: 700, letterSpacing: '0.25em', color: goldColor, textTransform:'uppercase', marginBottom: 2 }}>
+        <div style={{ fontFamily:serif, fontSize: subSize, fontWeight: 700, letterSpacing: '0.25em', color: goldColor, textTransform:'uppercase', marginBottom: 2 }}>
           FIRST
         </div>
-        <div style={{ fontFamily:"'Playfair Display', Georgia, serif", fontSize: fontSize, fontWeight: 900, color: textColor, letterSpacing: '-0.02em', lineHeight: 1 }}>
+        <div style={{ fontFamily:serif, fontSize: fontSize, fontWeight: 900, color: textColor, letterSpacing: '-0.02em', lineHeight: 1 }}>
           LOOP
         </div>
       </div>
@@ -39,6 +40,7 @@ export function Logo({ size = 'md', theme = 'navy' }) {
 }
 
 export function Pill({ children, gold, green, small }) {
+  const { B, serif, sans } = useTheme()
   const bg = gold ? B.goldPale : green ? '#E0EDE5' : '#E5EAF5'
   const fg = gold ? '#8a6010'  : green ? B.green    : B.navy
   return (
@@ -49,6 +51,7 @@ export function Pill({ children, gold, green, small }) {
 }
 
 export function Avatar({ initials, size=38, color=B.navy }) {
+  const { B, serif, sans } = useTheme()
   return (
     <div style={{ width:size, height:size, borderRadius:'50%', background:color, display:'flex', alignItems:'center', justifyContent:'center', color:B.cream, fontSize:size*0.32, fontWeight:700, flexShrink:0, fontFamily:sans }}>
       {initials}
@@ -57,6 +60,7 @@ export function Avatar({ initials, size=38, color=B.navy }) {
 }
 
 export function RatingChip({ value }) {
+  const { B, serif, sans } = useTheme()
   const [bg,fg] = value>=9.5 ? [B.green,'#e0ede5'] : value>=9 ? [B.navy,'#e5eaf4'] : [B.gold, B.goldPale]
   return (
     <div style={{ background:fg, color:bg, borderRadius:8, padding:'5px 10px', textAlign:'center', minWidth:50 }}>
@@ -66,6 +70,7 @@ export function RatingChip({ value }) {
 }
 
 export function Bar({ value, color }) {
+  const { B, serif, sans } = useTheme()
   return (
     <div style={{ height:5, borderRadius:3, background:'#E8E0D0', overflow:'hidden', flex:1 }}>
       <div style={{ height:'100%', width:`${(value/10)*100}%`, background:color, borderRadius:3 }}/>
@@ -74,6 +79,7 @@ export function Bar({ value, color }) {
 }
 
 export function RatingRow({ label, value, color }) {
+  const { B, serif, sans } = useTheme()
   return (
     <div style={{ display:'flex', alignItems:'center', gap:8 }}>
       <span style={{ fontSize:12, color:B.textMid, fontFamily:sans, fontWeight:500, width:88, flexShrink:0 }}>{label}</span>
@@ -84,16 +90,19 @@ export function RatingRow({ label, value, color }) {
 }
 
 export function NatBadge({ rank }) {
+  const { B, serif, sans } = useTheme()
   if (rank > 100) return null
   return <Pill gold><span>🏅</span> Natl #{rank}</Pill>
 }
 
 export function StatBadge({ state, rank }) {
+  const { B, serif, sans } = useTheme()
   if (rank > 20) return null
   return <Pill green><span>📍</span> {state} #{rank}</Pill>
 }
 
 export function CourseCard({ course, onClick, row }) {
+  const { B, serif, sans } = useTheme()
   const [hov, setHov] = useState(false)
   if (row) return (
     <div onClick={() => onClick(course)} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
@@ -147,6 +156,7 @@ export function CourseCard({ course, onClick, row }) {
 }
 
 export function PageBanner({ icon, title, subtitle, bg }) {
+  const { B, serif, sans } = useTheme()
   return (
     <div style={{ background:bg || B.navy, borderRadius:20, padding:'26px 26px 22px', marginBottom:20, position:'relative', overflow:'hidden' }}>
       <div style={{ position:'absolute', top:-50, right:-50, width:180, height:180, borderRadius:'50%', background:'rgba(196,150,58,0.07)' }}/>
@@ -160,6 +170,7 @@ export function PageBanner({ icon, title, subtitle, bg }) {
 }
 
 export function TabBar({ tabs, active, onChange }) {
+  const { B, serif, sans } = useTheme()
   return (
     <div style={{ display:'flex', background:B.white, borderRadius:12, padding:4, border:`1px solid ${B.border}`, marginBottom:16, gap:4 }}>
       {tabs.map(([id,label]) => (

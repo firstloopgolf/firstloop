@@ -1,7 +1,9 @@
 import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext.jsx'
-import { B, sans, NAV_TABS } from './lib/data.js'
+import { useTheme } from './contexts/ThemeContext.jsx'
+import { NAV_TABS } from './lib/data.js'
 import { Logo } from './components/UI.jsx'
+import ThemeToggle from './components/ThemeToggle.jsx'
 import Discover     from './pages/Discover.jsx'
 import Feed         from './pages/Feed.jsx'
 import Rankings     from './pages/Rankings.jsx'
@@ -18,6 +20,7 @@ import { useEffect, useState } from 'react'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
+  const { sans } = useTheme()
   if (loading) return <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'60vh', fontFamily:sans, color:'#999' }}>Loading...</div>
   if (!user) return <Navigate to="/auth" replace/>
   return children
@@ -26,16 +29,17 @@ function ProtectedRoute({ children }) {
 export default function App() {
   const navigate  = useNavigate()
   const location  = useLocation()
-  const { user, profile, loading, signOut } = useAuth() 
+  const { user, profile, loading, signOut } = useAuth()
+  const { B, sans } = useTheme()
+
   const activeTab = location.pathname.split('/')[1] || 'discover'
   const isAuth       = location.pathname === '/auth'
   const isLanding    = location.pathname === '/landing'
   const isOnboarding = location.pathname === '/onboarding'
-  const hideNav   = isAuth || isLanding || isOnboarding  // ← hide nav on onboarding
+  const hideNav   = isAuth || isLanding || isOnboarding
+
   const [installPrompt, setInstallPrompt] = useState(null)
   const [showIOSPrompt, setShowIOSPrompt] = useState(false)
-
-
 
   useEffect(() => {
     const titles = {
@@ -79,7 +83,7 @@ export default function App() {
   const nav = (tab) => navigate(tab === 'discover' ? '/' : `/${tab}`)
 
   return (
-    <div style={{ fontFamily:sans, background:'#F7F4EE', minHeight:'100vh' }}>
+    <div style={{ fontFamily:sans, background:B.feedBg, minHeight:'100vh' }}>
 
       {!hideNav && (
         <div style={{ background:B.navy, borderBottom:'1px solid rgba(240,232,213,0.08)', padding:'0 10px', display:'flex', alignItems:'center', justifyContent:'space-between', height:58, position:'sticky', top:0, zIndex:300 }}>
@@ -89,11 +93,15 @@ export default function App() {
           <div style={{ display:'flex', gap:1, alignItems:'center' }}>
             {NAV_TABS.map(t => (
               <button key={t.id} onClick={() => nav(t.id)}
-                style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:1, padding:'5px 7px', borderRadius:9, border:'none', background:activeTab===t.id ? 'rgba(196,150,58,0.15)':'transparent', color:activeTab===t.id ? B.gold:'rgba(240,232,213,0.45)', cursor:'pointer', transition:'all 0.15s' }}>
+                style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:1, padding:'5px 7px', borderRadius:9, border:'none', background:activeTab===t.id ? 'rgba(201,168,76,0.15)':'transparent', color:activeTab===t.id ? B.gold:'rgba(240,232,213,0.45)', cursor:'pointer', transition:'all 0.15s' }}>
                 <span style={{ fontSize:14 }}>{t.icon}</span>
                 <span style={{ fontSize:8, fontFamily:sans, fontWeight:600 }}>{t.label}</span>
               </button>
             ))}
+
+            {/* ── Theme toggle ── */}
+            <ThemeToggle />
+
             {user ? (
               <button onClick={() => signOut().then(() => navigate('/auth'))}
                 style={{ marginLeft:4, padding:'5px 8px', borderRadius:8, border:`1px solid rgba(240,232,213,0.2)`, background:'transparent', color:'rgba(240,232,213,0.6)', fontSize:10, fontFamily:sans, cursor:'pointer', whiteSpace:'nowrap' }}>
@@ -140,7 +148,7 @@ export default function App() {
 
       {/* Android install banner */}
       {installPrompt && !hideNav && (
-        <div style={{ position:'fixed', bottom:70, left:12, right:12, background:B.navy, borderRadius:16, padding:'14px 18px', display:'flex', alignItems:'center', gap:12, zIndex:400, boxShadow:'0 8px 32px rgba(0,0,0,0.3)', border:`1px solid rgba(196,150,58,0.3)` }}>
+        <div style={{ position:'fixed', bottom:70, left:12, right:12, background:B.navy, borderRadius:16, padding:'14px 18px', display:'flex', alignItems:'center', gap:12, zIndex:400, boxShadow:'0 8px 32px rgba(0,0,0,0.3)', border:`1px solid rgba(201,168,76,0.3)` }}>
           <div style={{ fontSize:28 }}>⛳</div>
           <div style={{ flex:1 }}>
             <div style={{ color:B.cream, fontSize:13, fontWeight:700, fontFamily:sans }}>Install First Loop</div>
@@ -159,7 +167,7 @@ export default function App() {
 
       {/* iOS install prompt */}
       {showIOSPrompt && !hideNav && (
-        <div style={{ position:'fixed', bottom:70, left:12, right:12, background:B.navy, borderRadius:16, padding:'16px 18px', zIndex:400, boxShadow:'0 8px 32px rgba(0,0,0,0.3)', border:`1px solid rgba(196,150,58,0.3)` }}>
+        <div style={{ position:'fixed', bottom:70, left:12, right:12, background:B.navy, borderRadius:16, padding:'16px 18px', zIndex:400, boxShadow:'0 8px 32px rgba(0,0,0,0.3)', border:`1px solid rgba(201,168,76,0.3)` }}>
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:10 }}>
             <div style={{ display:'flex', alignItems:'center', gap:10 }}>
               <div style={{ fontSize:28 }}>⛳</div>
@@ -177,7 +185,7 @@ export default function App() {
             <div style={{ color:'rgba(240,232,213,0.8)', fontSize:12, fontFamily:sans, lineHeight:1.7 }}>
               <div style={{ display:'flex', alignItems:'flex-start', gap:8, marginBottom:8 }}>
                 <span style={{ color:B.gold, fontWeight:700, flexShrink:0 }}>1.</span>
-                <span>Tap the <strong style={{ color:B.gold }}>Share button</strong> at the bottom of Safari — you may need to press . . . first</span>
+                <span>Tap the <strong style={{ color:B.gold }}>Share button</strong> at the bottom of Safari</span>
               </div>
               <div style={{ display:'flex', alignItems:'flex-start', gap:8, marginBottom:8 }}>
                 <span style={{ color:B.gold, fontWeight:700, flexShrink:0 }}>2.</span>

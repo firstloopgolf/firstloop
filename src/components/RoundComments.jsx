@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 
 export default function RoundComments({ roundId, initialCount = 0 }) {
+  const { B, serif, sans } = useTheme()
   const { user, profile } = useAuth()
   const navigate          = useNavigate()
   const inputRef          = useRef(null)

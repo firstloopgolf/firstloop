@@ -1,25 +1,6 @@
-// ── BRAND TOKENS ─────────────────────────────────────────────
-export const B = {
-  navy:       '#1B3054',
-  navyLight:  '#243d6b',
-  navyDark:   '#111f38',
-  green:      '#1E4530',
-  greenLight: '#2a5c3f',
-  gold:       '#C4963A',
-  goldLight:  '#D9AF5A',
-  goldPale:   '#F5ECD6',
-  cream:      '#F0E8D5',
-  creamDark:  '#E5D9C0',
-  white:      '#FFFFFF',
-  feedBg:     '#F7F4EE',
-  textNavy:   '#1B3054',
-  textMid:    '#4A5E78',
-  textSoft:   '#7A8FA8',
-  border:     '#E2D9C8',
-}
-
-export const serif = "'Playfair Display', Georgia, serif"
-export const sans  = "'DM Sans', system-ui, sans-serif"
+// ── DATA — Course data, feed data, nav config ─────────────────
+// NOTE: B, serif, and sans have moved to src/lib/theme.js
+// and are accessed via useTheme() — do not re-add them here.
 
 export const COURSES = [
   { id:1,  name:'Augusta National Golf Club',    location:'Augusta, GA',          state:'GA', rating:9.8, conditions:9.9, value:7.2, vibes:9.9, reviews:1842, bg:'#1E4530',  icon:'🌿', natRank:1,  stRank:1, par:72, price:'$$$$', lat:33.5,  lng:-82.0,  desc:'The most iconic private club on Earth. Home of The Masters since 1934.' },

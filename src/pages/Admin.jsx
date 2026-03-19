@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 import { PageBanner } from '../components/UI.jsx'
 
 export default function Admin() {
+  const { B, serif, sans } = useTheme()
   const navigate          = useNavigate()
   const { user, isAdmin } = useAuth()
 

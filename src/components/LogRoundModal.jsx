@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 import ShareRoundModal from './ShareRoundModal.jsx'
 
 // ─── Elo Algorithm ─────────────────────────────────────────────────────────────
@@ -21,6 +21,7 @@ const EMOJIS = ['', '😤', '😕', '😐', '😊', '🤩']
 const LABELS = ['', 'Poor', 'Below Average', 'Average', 'Great', 'World Class']
 
 function EmojiPicker({ value, onChange, color }) {
+  const { B, serif, sans } = useTheme()
   return (
     <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
       {[1, 2, 3, 4, 5].map(v => (
@@ -48,6 +49,7 @@ function EmojiPicker({ value, onChange, color }) {
 
 // ─── Elo Comparison Screen ──────────────────────────────────────────────────────
 function EloComparison({ newCourseName, previousRounds, onComplete }) {
+  const { B, serif, sans } = useTheme()
   const [comparisons, setComparisons] = useState([])
   const [currentPair, setCurrentPair] = useState(null)
   const [eloScores, setEloScores]     = useState({})
@@ -205,6 +207,7 @@ function EloComparison({ newCourseName, previousRounds, onComplete }) {
 
 // ─── Success Screen ─────────────────────────────────────────────────────────────
 function SuccessScreen({ courseName, courseId, score, finalRank, round, course, onClose, onViewFeed }) {
+  const { B, serif, sans } = useTheme()
   const [showShare, setShowShare] = useState(false)
 
   return (
@@ -271,6 +274,7 @@ function SuccessScreen({ courseName, courseId, score, finalRank, round, course, 
 
 // ─── Main Modal ─────────────────────────────────────────────────────────────────
 export default function LogRoundModal({ courseId, courseName, onClose, onSuccess }) {
+  const { B, serif, sans } = useTheme()
   const { user }   = useAuth()
   const navigate   = useNavigate()
   const fileRef    = useRef(null)

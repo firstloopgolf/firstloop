@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 import { Avatar, NatBadge, PageBanner } from '../components/UI.jsx'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
 import RoundComments from '../components/RoundComments.jsx'
@@ -67,6 +67,7 @@ function AxisPills({ conditions, value, vibes }) {
 }
 
 export default function Feed() {
+  const { B, serif, sans } = useTheme()
   const navigate          = useNavigate()
   const { user }          = useAuth()
   const [rounds,     setRounds]     = useState([])

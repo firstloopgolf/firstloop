@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 import { Logo } from '../components/UI.jsx'
 
 export default function Landing() {
+  const { B, serif, sans } = useTheme()
   const navigate = useNavigate()
 
   return (

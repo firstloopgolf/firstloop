@@ -6,51 +6,64 @@
   padding: 0;
 }
 
-:root {
-  --navy:       #1B3054;
-  --navy-light: #243d6b;
-  --navy-dark:  #111f38;
-  --green:      #1E4530;
-  --green-light:#2a5c3f;
-  --gold:       #C4963A;
-  --gold-light: #D9AF5A;
-  --gold-pale:  #F5ECD6;
-  --cream:      #F0E8D5;
-  --cream-dark: #E5D9C0;
-  --white:      #FFFFFF;
-  --feed-bg:    #F7F4EE;
-  --text-navy:  #1B3054;
-  --text-mid:   #4A5E78;
-  --text-soft:  #7A8FA8;
-  --border:     #E2D9C8;
+/* ── Light mode tokens (default) ─────────────────────────────── */
+:root,
+[data-theme="light"] {
+  --fl-bg:        #f5f0e8;
+  --fl-surface:   #ede8de;
+  --fl-card:      #ffffff;
+  --fl-feed-bg:   #f0ebe0;
+  --fl-navy:      #1a2e1a;
+  --fl-green:     #2d5a27;
+  --fl-gold:      #c9a84c;
+  --fl-cream:     #f5f0e8;
+  --fl-border:    rgba(212,196,160,0.6);
+  --fl-text:      #1c1c1e;
+  --fl-text-mid:  #5a5a5a;
+  --fl-text-soft: #8a8a8a;
+}
 
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-sans:  'DM Sans', system-ui, sans-serif;
+/* ── Dark mode tokens ─────────────────────────────────────────── */
+[data-theme="dark"] {
+  --fl-bg:        #0e140e;
+  --fl-surface:   #151f15;
+  --fl-card:      #1a261a;
+  --fl-feed-bg:   #0e140e;
+  --fl-navy:      #151f15;
+  --fl-green:     #2d5a27;
+  --fl-gold:      #c9a84c;
+  --fl-cream:     #e8e4da;
+  --fl-border:    rgba(74,144,64,0.2);
+  --fl-text:      #e8e4da;
+  --fl-text-mid:  #9a9080;
+  --fl-text-soft: #5a5448;
 }
 
 html {
-  font-family: var(--font-sans);
-  background: var(--feed-bg);
-  color: var(--text-navy);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--fl-bg);
+  color: var(--fl-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 body {
   min-height: 100vh;
+  background: var(--fl-bg);
 }
 
 button {
-  font-family: var(--font-sans);
+  font-family: 'DM Sans', system-ui, sans-serif;
   cursor: pointer;
 }
 
 input, textarea, select {
-  font-family: var(--font-sans);
+  font-family: 'DM Sans', system-ui, sans-serif;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-soft); }
+::-webkit-scrollbar-thumb { background: var(--fl-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--fl-text-soft); }

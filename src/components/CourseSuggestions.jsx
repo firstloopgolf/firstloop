@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 
 function normalizeCourse(c) {
   return {
@@ -21,11 +21,12 @@ function normalizeCourse(c) {
     natRank:    c.nat_rank     || 999,
     stRank:     c.st_rank      || 999,
     icon:       c.icon         || '⛳',
-    bg:         c.bg_color     || B.navy,
+    bg:         c.bg_color     || '#1a2e1a',
   }
 }
 
 export default function CourseSuggestions() {
+  const { B, serif, sans } = useTheme()
   const navigate              = useNavigate()
   const { user }              = useAuth()
   const [suggestions, setSuggestions] = useState([])

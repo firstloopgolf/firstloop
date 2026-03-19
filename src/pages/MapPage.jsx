@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 import { supabase } from '../lib/supabase.js'
 
 // ── State bounding boxes [minLat, minLng, maxLat, maxLng] ─────
@@ -30,6 +30,7 @@ const ZOOM_STATE = 5   // 4 = national only; 5+ = state ranked
 const ZOOM_ALL   = 8   // 8+ = all courses in viewport
 
 export default function MapPage() {
+  const { B, serif, sans } = useTheme()
   const navigate       = useNavigate()
   const mapRef         = useRef(null)
   const mapInstance    = useRef(null)

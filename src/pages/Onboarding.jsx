@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 
 // ── Elo helpers ──────────────────────────────────────────────────────────────
 const ELO_DEFAULT = 1500
@@ -450,6 +450,7 @@ function StepFollow({ onFinish }) {
 
 // ── Main Onboarding Component ─────────────────────────────────────────────────
 export default function Onboarding() {
+  const { B, serif, sans } = useTheme()
   const navigate = useNavigate()
   const { profile } = useAuth()
   const [step,         setStep]         = useState(1)

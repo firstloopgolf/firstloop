@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { B, serif, sans } from '../lib/data.js'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 import { PageBanner } from '../components/UI.jsx'
 import { useCourses } from '../hooks/useCourses.js'
 
@@ -19,6 +19,7 @@ function RankBadge({ isLive }) {
 }
 
 export default function Rankings() {
+  const { B, serif, sans } = useTheme()
   const navigate = useNavigate()
   const { courses, loading } = useCourses()
   const [tab, setTab]     = useState('national')
