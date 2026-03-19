@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext.jsx'
+import { useTheme } from '../contexts/ThemeContext.jsx'
 import { Logo } from '../components/UI.jsx'
 
 export default function Auth() {
+  const { B, serif, sans } = useTheme()
   const navigate = useNavigate()
   const { signIn, signUp } = useAuth()
   const [mode, setMode]         = useState('login')
