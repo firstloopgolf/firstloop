@@ -126,13 +126,8 @@ export default function Profile() {
               {profile?.handicap != null && <Pill gold>⛳ Hdcp: {profile.handicap}</Pill>}
               {profile?.location  && <Pill gold>📍 {profile.location}</Pill>}
             </div>
-                  </div>
-
-        <button onClick={() => setShowPassport(true)}
-          style={{ width: '100%', marginTop: 14, background: 'rgba(201,168,76,0.12)', color: B.gold, border: '1px solid rgba(201,168,76,0.25)', borderRadius: 11, padding: '10px 0', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: serif, letterSpacing: '0.02em' }}>
-          🗂 Share my Golf Passport
-        </button>
-      </div>
+          </div>
+        </div>
 
         {/* Stats grid — now shows Courses, Avg Score, States, #1 Course */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
@@ -148,6 +143,11 @@ export default function Profile() {
             </div>
           ))}
         </div>
+
+        <button onClick={() => setShowPassport(true)}
+          style={{ width: '100%', marginTop: 14, background: 'rgba(201,168,76,0.12)', color: B.gold, border: '1px solid rgba(201,168,76,0.25)', borderRadius: 11, padding: '10px 0', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: serif, letterSpacing: '0.02em' }}>
+          🗂 Share my Golf Passport
+        </button>
       </div>
 
       {/* ── Badges ── */}
