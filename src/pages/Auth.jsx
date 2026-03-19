@@ -43,7 +43,7 @@ export default function Auth() {
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:B.navy, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
+    <div style={{ minHeight:'-webkit-fill-available', background:B.navy, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
       <div style={{ width:'100%', maxWidth:400 }}>
 
         <div style={{ display:'flex', justifyContent:'center', marginBottom:32 }}>

@@ -483,7 +483,7 @@ export default function Onboarding() {
 
   return (
     <div style={{
-      minHeight: '100vh', background: B.navy,
+      minHeight: '-webkit-fill-available', background: B.navy,
       display: 'flex', flexDirection: 'column', justifyContent: 'center',
       padding: '40px 0',
     }}>

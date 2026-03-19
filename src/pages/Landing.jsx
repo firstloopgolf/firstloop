@@ -7,7 +7,7 @@ export default function Landing() {
   const navigate = useNavigate()
 
   return (
-    <div style={{ fontFamily:sans, background:B.navy, minHeight:'100vh', overflowX:'hidden' }}>
+    <div style={{ fontFamily:sans, background:B.navy, minHeight:'-webkit-fill-available', overflowX:'hidden' }}>
 
       {/* Nav */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 28px', maxWidth:1100, margin:'0 auto' }}>
