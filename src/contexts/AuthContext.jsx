@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 
 const AuthContext = createContext({})
@@ -10,20 +9,23 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Set up the auth state listener first — always
+    // onAuthStateChange must be set up BEFORE getSession so it catches
+    // the SIGNED_IN event that Supabase fires when it auto-parses the
+    // access_token hash on page load (email confirmation flow)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
 
       if (session?.user) {
         fetchProfile(session.user.id)
 
+        // Supabase auto-parses the #access_token hash and fires SIGNED_IN.
+        // If type=signup is in the hash, this is a new user confirming email.
         if (event === 'SIGNED_IN') {
-          // Check if this came from an email confirmation link
-          const params = new URLSearchParams(window.location.hash.replace('#', '?'))
+          const params = new URLSearchParams(window.location.hash.slice(1))
           if (params.get('type') === 'signup') {
+            // Clear the token hash from the URL then go to onboarding
             window.history.replaceState(null, '', '/onboarding')
-            window.location.href = '/onboarding'
-            return
+            window.location.replace('/onboarding')
           }
         }
       } else {
@@ -32,25 +34,13 @@ export function AuthProvider({ children }) {
       }
     })
 
-    // If the URL contains email confirmation tokens, call setSession to
-    // exchange them for a live session — this triggers onAuthStateChange above
-    const hash = window.location.hash
-    if (hash && hash.includes('access_token')) {
-      const params = new URLSearchParams(hash.replace('#', '?'))
-      const accessToken  = params.get('access_token')
-      const refreshToken = params.get('refresh_token')
-      if (accessToken && refreshToken) {
-        supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
-        // setSession triggers onAuthStateChange, which handles the redirect
-        return () => subscription.unsubscribe()
-      }
-    }
-
-    // Normal page load — grab existing session
+    // After the listener is set up, check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id)
-      else setLoading(false)
+      // Only set state here if onAuthStateChange hasn't already handled it
+      if (!session) {
+        setUser(null)
+        setLoading(false)
+      }
     })
 
     return () => subscription.unsubscribe()
