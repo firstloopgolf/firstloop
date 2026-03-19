@@ -19,6 +19,7 @@ const EMOJIS = ['', '😤', '😕', '😐', '😊', '🤩']
 const LABELS = ['', 'Poor', 'Below Average', 'Average', 'Great', 'World Class']
 
 function EmojiPicker({ value, onChange, color }) {
+  const { B, serif, sans } = useTheme()
   return (
     <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
       {[1, 2, 3, 4, 5].map(v => (
@@ -41,6 +42,7 @@ function EmojiPicker({ value, onChange, color }) {
 
 // ── Step indicator ────────────────────────────────────────────────────────────
 function StepBar({ current, total }) {
+  const { B, serif, sans } = useTheme()
   return (
     <div style={{ display: 'flex', gap: 6, marginBottom: 28 }}>
       {Array.from({ length: total }).map((_, i) => (

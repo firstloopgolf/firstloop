@@ -19,6 +19,7 @@ function ratingEmoji(v) {
 
 // The "#X in their list" rank badge — the core differentiator
 function EloRankBadge({ rank }) {
+  const { B, serif, sans } = useTheme()
   if (!rank) return null
   const isTop3 = rank <= 3
   return (
@@ -40,6 +41,7 @@ function EloRankBadge({ rank }) {
 
 // Compact 3-axis emoji pills
 function AxisPills({ conditions, value, vibes }) {
+  const { B, serif, sans } = useTheme()
   const axes = [
     { label: 'Conditions', emoji: ratingEmoji(conditions), color: B.green },
     { label: 'Value',      emoji: ratingEmoji(value),      color: B.navy  },

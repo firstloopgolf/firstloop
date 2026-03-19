@@ -5,6 +5,7 @@ import { PageBanner } from '../components/UI.jsx'
 import { useCourses } from '../hooks/useCourses.js'
 
 function RankBadge({ isLive }) {
+  const { B, serif, sans } = useTheme()
   return (
     <span style={{
       fontSize: 9, fontWeight: 700, fontFamily: sans,
