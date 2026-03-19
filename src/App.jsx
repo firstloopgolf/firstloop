@@ -17,6 +17,8 @@ import Onboarding   from './pages/Onboarding.jsx'
 import LogCourse    from './pages/LogCourse.jsx'
 import Admin        from './pages/Admin.jsx'
 import { useEffect, useState } from 'react'
+import { supabase } from './lib/supabase.js'
+import AuthConfirm from './pages/AuthConfirm.jsx'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -65,6 +67,19 @@ export default function App() {
     const hasSeenPrompt = sessionStorage.getItem('iosPromptSeen')
     if (isIOS && !isStandalone && !hasSeenPrompt) {
       setTimeout(() => setShowIOSPrompt(true), 3000)
+    }
+  }, [])
+
+  // Handle email confirmation tokens in URL hash
+  useEffect(() => {
+    const hash = window.location.hash
+    if (hash && hash.includes('access_token') && hash.includes('type=signup')) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          window.history.replaceState(null, '', '/onboarding')
+          window.location.replace('/onboarding')
+        }
+      })
     }
   }, [])
 
@@ -131,6 +146,7 @@ export default function App() {
           <Route path="/log"         element={<ProtectedRoute><LogCourse /></ProtectedRoute>} />
           <Route path="/profile"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/admin"       element={<Admin />} />
+          <Route path="/auth/confirm" element={<AuthConfirm />} />
         </Routes>
       </div>
 
