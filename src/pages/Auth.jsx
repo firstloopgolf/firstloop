@@ -19,7 +19,7 @@ export default function Auth() {
   const inputStyle = {
     width: '100%', padding: '12px 14px', borderRadius: 10,
     border: `1px solid ${B.border}`, fontSize: 14, fontFamily: sans,
-    color: B.textNavy, outline: 'none', background: '#fff',
+    color: B.textNavy, outline: 'none', background: B.white,
     boxSizing: 'border-box', marginBottom: 12,
   }
 
@@ -52,7 +52,7 @@ export default function Auth() {
           <Logo size="lg" theme="navy"/>
         </div>
 
-        <div style={{ background:'#fff', borderRadius:20, padding:32 }}>
+        <div style={{ background:B.white, borderRadius:20, padding:32 }}>
           <h2 style={{ fontFamily:serif, fontSize:22, fontWeight:900, color:B.textNavy, margin:'0 0 6px' }}>
             {mode === 'login' ? 'Welcome back' : 'Create your account'}
           </h2>

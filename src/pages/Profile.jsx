@@ -87,7 +87,7 @@ export default function Profile() {
   const inputStyle = {
     width: '100%', padding: '11px 13px', borderRadius: 10,
     border: `1px solid ${B.border}`, fontSize: 14, fontFamily: sans,
-    color: B.textNavy, outline: 'none', background: '#fff', boxSizing: 'border-box',
+    color: B.textNavy, outline: 'none', background: B.white, boxSizing: 'border-box',
   }
 
   const tabs = [['rounds', 'My Rounds'], ['stats', 'Stats'], ['edit', 'Edit Profile']]
@@ -119,7 +119,7 @@ export default function Profile() {
             <h1 style={{ color: B.cream, margin: '0 0 3px', fontSize: 21, fontWeight: 900, fontFamily: serif, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {profile?.full_name || profile?.username || 'Golfer'}
             </h1>
-            <div style={{ color: 'rgba(240,232,213,0.6)', fontSize: 12, fontFamily: sans, marginBottom: 8 }}>
+            <div style={{ color: B.cream, opacity: 0.6, fontSize: 12, fontFamily: sans, marginBottom: 8 }}>
               @{profile?.username || 'firstloop'} · Member since {new Date(user?.created_at).getFullYear()}
             </div>
             <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
@@ -133,7 +133,7 @@ export default function Profile() {
           🗂 Share my Golf Passport
         </button>
       </div>
-      
+
         {/* Stats grid — now shows Courses, Avg Score, States, #1 Course */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
           {[
@@ -151,7 +151,7 @@ export default function Profile() {
       </div>
 
       {/* ── Badges ── */}
-      <div style={{ background: '#fff', borderRadius: 15, padding: '14px 16px', marginBottom: 16, border: `1px solid ${B.border}` }}>
+      <div style={{ background: B.white, borderRadius: 15, padding: '14px 16px', marginBottom: 16, border: `1px solid ${B.border}` }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: B.textNavy, fontFamily: serif, marginBottom: 10 }}>🏅 Badges Earned</div>
         <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: B.feedBg, borderRadius: 999, padding: '4px 11px', border: `1px solid ${B.border}` }}>
@@ -186,7 +186,7 @@ export default function Profile() {
       </div>
 
       {/* ── Tabs ── */}
-      <div style={{ display: 'flex', background: '#fff', borderRadius: 12, padding: 4, border: `1px solid ${B.border}`, marginBottom: 16, gap: 4 }}>
+      <div style={{ display: 'flex', background: B.white, borderRadius: 12, padding: 4, border: `1px solid ${B.border}`, marginBottom: 16, gap: 4 }}>
         {tabs.map(([v, l]) => (
           <button key={v} onClick={() => setTab(v)}
             style={{ flex: 1, padding: '9px 0', borderRadius: 9, border: 'none', background: tab === v ? B.navy : 'transparent', color: tab === v ? B.cream : B.textMid, fontWeight: 600, cursor: 'pointer', fontSize: 12, fontFamily: sans, transition: 'all 0.15s' }}>
@@ -206,11 +206,11 @@ export default function Profile() {
           {loading ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
               {[...Array(3)].map((_, i) => (
-                <div key={i} style={{ background: '#fff', borderRadius: 13, height: 72, border: `1px solid ${B.border}`, opacity: 0.5 }}/>
+                <div key={i} style={{ background: B.white, borderRadius: 13, height: 72, border: `1px solid ${B.border}`, opacity: 0.5 }}/>
               ))}
             </div>
           ) : rounds.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', background: '#fff', borderRadius: 16, border: `1px solid ${B.border}` }}>
+            <div style={{ textAlign: 'center', padding: '40px 0', background: B.white, borderRadius: 16, border: `1px solid ${B.border}` }}>
               <div style={{ fontSize: 40, marginBottom: 12 }}>⛳</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: B.textNavy, fontFamily: serif, marginBottom: 6 }}>No rounds logged yet</div>
               <div style={{ fontSize: 13, color: B.textSoft, fontFamily: sans }}>Find a course and log your first round</div>
@@ -233,7 +233,7 @@ export default function Profile() {
                   <div
                     key={r.id}
                     onClick={() => navigate(`/course/${r.course_id}`)}
-                    style={{ background: '#fff', borderRadius: 13, padding: '13px 15px', cursor: 'pointer', border: `1px solid ${B.border}`, display: 'flex', alignItems: 'center', gap: 11, transition: 'all 0.15s' }}
+                    style={{ background: B.white, borderRadius: 13, padding: '13px 15px', cursor: 'pointer', border: `1px solid ${B.border}`, display: 'flex', alignItems: 'center', gap: 11, transition: 'all 0.15s' }}
                     onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(27,48,84,0.08)'; e.currentTarget.style.borderColor = B.gold }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = B.border }}
                   >
@@ -296,7 +296,7 @@ export default function Profile() {
 
           {/* Score history chart */}
           {rounds.filter(r => r.score).length > 0 && (
-            <div style={{ background: '#fff', borderRadius: 15, padding: 18, border: `1px solid ${B.border}` }}>
+            <div style={{ background: B.white, borderRadius: 15, padding: 18, border: `1px solid ${B.border}` }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: B.textNavy, fontFamily: serif, marginBottom: 14 }}>Score History</div>
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 100 }}>
                 {rounds.filter(r => r.score).slice(0, 8).reverse().map((r, i) => (
@@ -316,7 +316,7 @@ export default function Profile() {
 
           {/* Top 3 ranked courses */}
           {rounds.length > 0 && (
-            <div style={{ background: '#fff', borderRadius: 15, padding: 18, border: `1px solid ${B.border}` }}>
+            <div style={{ background: B.white, borderRadius: 15, padding: 18, border: `1px solid ${B.border}` }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: B.textNavy, fontFamily: serif, marginBottom: 14 }}>🏆 Your Top Courses</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {rounds.slice(0, 3).map((r, i) => {
@@ -343,7 +343,7 @@ export default function Profile() {
               ['States Played', states.length,    states.slice(0, 3).join(' · ') || 'none yet'],
               ['Best Score',    bestRound?.score || '--', bestRound?.courses?.name || ''],
             ].map(([label, val, sub]) => (
-              <div key={label} style={{ background: '#fff', borderRadius: 13, padding: '15px 13px', border: `1px solid ${B.border}`, textAlign: 'center' }}>
+              <div key={label} style={{ background: B.white, borderRadius: 13, padding: '15px 13px', border: `1px solid ${B.border}`, textAlign: 'center' }}>
                 <div style={{ fontSize: 11, color: B.textSoft, fontFamily: sans, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>{label}</div>
                 <div style={{ fontSize: 17, fontWeight: 800, color: B.textNavy, fontFamily: serif, marginBottom: 3 }}>{val}</div>
                 <div style={{ fontSize: 11, color: B.textSoft, fontFamily: sans }}>{sub}</div>
@@ -353,7 +353,7 @@ export default function Profile() {
 
           <button
             onClick={() => signOut().then(() => navigate('/auth'))}
-            style={{ width: '100%', background: '#fff', color: B.textMid, border: `1px solid ${B.border}`, borderRadius: 12, padding: '13px 0', fontWeight: 600, fontSize: 14, cursor: 'pointer', fontFamily: sans }}
+            style={{ width: '100%', background: B.white, color: B.textMid, border: `1px solid ${B.border}`, borderRadius: 12, padding: '13px 0', fontWeight: 600, fontSize: 14, cursor: 'pointer', fontFamily: sans }}
           >
             Sign Out
           </button>
@@ -362,7 +362,7 @@ export default function Profile() {
 
       {/* ── EDIT PROFILE ── */}
       {tab === 'edit' && (
-        <div style={{ background: '#fff', borderRadius: 16, padding: 24, border: `1px solid ${B.border}` }}>
+        <div style={{ background: B.white, borderRadius: 16, padding: 24, border: `1px solid ${B.border}` }}>
           <h3 style={{ margin: '0 0 20px', color: B.textNavy, fontFamily: serif, fontSize: 18 }}>Edit Profile</h3>
 
           {saveMsg && (
@@ -404,7 +404,7 @@ export default function Profile() {
               </button>
             )}
             <button onClick={() => signOut().then(() => navigate('/auth'))}
-              style={{ width: '100%', background: '#fff', color: B.textMid, border: `1px solid ${B.border}`, borderRadius: 12, padding: '13px 0', fontWeight: 600, fontSize: 14, cursor: 'pointer', fontFamily: sans }}>
+              style={{ width: '100%', background: B.white, color: B.textMid, border: `1px solid ${B.border}`, borderRadius: 12, padding: '13px 0', fontWeight: 600, fontSize: 14, cursor: 'pointer', fontFamily: sans }}>
               Sign Out
             </button>
           </div>

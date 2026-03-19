@@ -34,7 +34,7 @@ export default function SubmitCourse() {
   const inputStyle = {
     width:'100%', padding:'11px 13px', borderRadius:10,
     border:`1px solid ${B.border}`, fontSize:14, fontFamily:sans,
-    color:B.textNavy, outline:'none', background:'#fff',
+    color:B.textNavy, outline:'none', background:B.white,
     boxSizing:'border-box',
   }
 

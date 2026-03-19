@@ -295,7 +295,7 @@ export default function LogCourse() {
   const inputStyle = {
     width: '100%', padding: '12px 14px', borderRadius: 10,
     border: `1px solid ${B.border}`, fontSize: 14, fontFamily: sans,
-    color: B.textNavy, outline: 'none', background: '#fff', boxSizing: 'border-box',
+    color: B.textNavy, outline: 'none', background: B.white, boxSizing: 'border-box',
   }
 
   return (
@@ -318,7 +318,7 @@ export default function LogCourse() {
           {searching && <div style={{ textAlign: 'center', padding: '16px', fontFamily: sans, fontSize: 13, color: B.textSoft }}>Searching...</div>}
 
           {results.length > 0 && (
-            <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: `1px solid ${B.border}` }}>
+            <div style={{ background: B.white, borderRadius: 16, overflow: 'hidden', border: `1px solid ${B.border}` }}>
               {results.map(course => (
                 <button key={course.id}
                   onClick={() => { setSelectedCourse(course); setSearch(''); setResults([]); setStep(2) }}
@@ -337,7 +337,7 @@ export default function LogCourse() {
           )}
 
           {search.length >= 2 && !searching && results.length === 0 && (
-            <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: `1px solid ${B.border}`, textAlign: 'center' }}>
+            <div style={{ background: B.white, borderRadius: 16, padding: '20px', border: `1px solid ${B.border}`, textAlign: 'center' }}>
               <div style={{ fontSize: 13, color: B.textSoft, fontFamily: sans, marginBottom: 12 }}>Can't find "{search}"?</div>
               <button onClick={() => navigate('/submit')}
                 style={{ background: B.navy, color: B.cream, border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: sans }}>
@@ -577,7 +577,7 @@ export default function LogCourse() {
               View in Feed
             </button>
             <button onClick={() => navigate('/profile')}
-              style={{ width: '100%', background: '#fff', color: B.textMid, border: `1px solid ${B.border}`, borderRadius: 12, padding: '12px 0', fontWeight: 600, fontSize: 13, cursor: 'pointer', fontFamily: sans }}>
+              style={{ width: '100%', background: B.white, color: B.textMid, border: `1px solid ${B.border}`, borderRadius: 12, padding: '12px 0', fontWeight: 600, fontSize: 13, cursor: 'pointer', fontFamily: sans }}>
               See My Rankings
             </button>
           </div>

@@ -104,7 +104,7 @@ export default function CourseDetail() {
           {loadingRounds ? (
             <div style={{ textAlign:'center', padding:'40px 0', color:B.textSoft, fontFamily:sans }}>Loading reviews...</div>
           ) : rounds.length === 0 ? (
-            <div style={{ background:'#fff', borderRadius:16, border:`1px solid ${B.border}`, overflow:'hidden' }}>
+            <div style={{ background:B.white, borderRadius:16, border:`1px solid ${B.border}`, overflow:'hidden' }}>
               {/* Hero banner */}
               <div style={{ background:course.bg, padding:'28px 24px', textAlign:'center' }}>
                 <div style={{ fontSize:52, marginBottom:8 }}>{course.icon}</div>
@@ -155,7 +155,7 @@ export default function CourseDetail() {
           ) : (
             <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
               {rounds.map((round,i) => (
-                <div key={round.id} style={{ background:'#fff', borderRadius:14, border:`1px solid ${B.border}`, padding:'16px 18px' }}>
+                <div key={round.id} style={{ background:B.white, borderRadius:14, border:`1px solid ${B.border}`, padding:'16px 18px' }}>
                   <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:10 }}>
                     <Avatar initials={(round.profiles?.full_name || round.profiles?.username || 'U').slice(0,2).toUpperCase()} size={40} color={i%2===0 ? B.navy:B.green}/>
                     <div style={{ flex:1 }}>
@@ -197,7 +197,7 @@ export default function CourseDetail() {
       )}
 
       {tab==='ratings' && (
-        <div style={{ background:'#fff', borderRadius:16, padding:24, border:`1px solid ${B.border}` }}>
+        <div style={{ background:B.white, borderRadius:16, padding:24, border:`1px solid ${B.border}` }}>
           {course.hasSeedRating && rounds.length === 0 && (
             <div style={{ background:'rgba(196,150,58,0.1)', border:`1px solid rgba(196,150,58,0.25)`, borderRadius:10, padding:'10px 14px', marginBottom:16, fontSize:12, color:'#8a6010', fontFamily:sans, lineHeight:1.6 }}>
               <strong>✦ Editorial Rating</strong> — This course hasn't been reviewed on First Loop yet. The rating shown is a seed based on expert publications and course reputation. It will update automatically as community reviews come in.
@@ -230,7 +230,7 @@ export default function CourseDetail() {
       )}
 
       {tab==='about' && (
-        <div style={{ background:'#fff', borderRadius:16, padding:24, border:`1px solid ${B.border}` }}>
+        <div style={{ background:B.white, borderRadius:16, padding:24, border:`1px solid ${B.border}` }}>
           <h3 style={{ margin:'0 0 16px', color:B.textNavy, fontFamily:serif, fontSize:18 }}>Course Details</h3>
           {[['📍 Location',course.location],['🏴 State',course.state],['⛳ Par',course.par],['⛳ Holes',course.holes||18],['💰 Price Range',course.price],['🏆 National Rank',`#${course.natRank}`],[`📍 ${course.state} Rank`,`#${course.stRank}`]].map(([k,v]) => (
             <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'11px 0', borderBottom:`1px solid ${B.feedBg}` }}>

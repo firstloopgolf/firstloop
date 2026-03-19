@@ -38,7 +38,7 @@ export default function Rankings() {
     <div>
       <PageBanner icon="🏆" title="Course Rankings" subtitle="Real ratings from real golfers — updated weekly" bg={B.green}/>
 
-      <div style={{ display:'flex', background:'#fff', borderRadius:12, padding:4, border:`1px solid ${B.border}`, marginBottom:18, gap:4 }}>
+      <div style={{ display:'flex', background:B.white, borderRadius:12, padding:4, border:`1px solid ${B.border}`, marginBottom:18, gap:4 }}>
         {[['national','🇺🇸 National Top 100'],['state','📍 State Top 20']].map(([v,l]) => (
           <button key={v} onClick={() => setTab(v)} style={{ flex:1, padding:'9px 0', borderRadius:9, border:'none', background:tab===v ? B.navy:'transparent', color:tab===v ? B.cream:B.textMid, fontWeight:600, cursor:'pointer', fontSize:13, fontFamily:sans, transition:'all 0.15s' }}>{l}</button>
         ))}
@@ -58,7 +58,7 @@ export default function Rankings() {
       {loading ? (
         <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
           {[...Array(5)].map((_,i) => (
-            <div key={i} style={{ background:'#fff', borderRadius:12, height:64, border:`1px solid ${B.border}`, opacity:0.5 }}/>
+            <div key={i} style={{ background:B.white, borderRadius:12, height:64, border:`1px solid ${B.border}`, opacity:0.5 }}/>
           ))}
         </div>
       ) : (
@@ -76,7 +76,7 @@ export default function Rankings() {
               </div>
               <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
                 {nat.slice(3).map((c,i) => (
-                  <div key={c.id} onClick={() => navigate(`/course/${c.id}`)} style={{ background:'#fff', borderRadius:12, padding:'12px 15px', cursor:'pointer', border:`1px solid ${B.border}`, display:'flex', alignItems:'center', gap:12, transition:'all 0.15s' }}
+                  <div key={c.id} onClick={() => navigate(`/course/${c.id}`)} style={{ background:B.white, borderRadius:12, padding:'12px 15px', cursor:'pointer', border:`1px solid ${B.border}`, display:'flex', alignItems:'center', gap:12, transition:'all 0.15s' }}
                     onMouseEnter={e => { e.currentTarget.style.boxShadow='0 4px 16px rgba(27,48,84,0.08)'; e.currentTarget.style.borderColor=B.gold }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow='none'; e.currentTarget.style.borderColor=B.border }}>
                     <div style={{ width:34, height:34, borderRadius:8, background:B.feedBg, display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:13, color:B.textMid, fontFamily:serif, flexShrink:0 }}>{i+4}</div>
@@ -98,7 +98,7 @@ export default function Rankings() {
           {tab==='state' && (
             <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
               {(st.length ? st : nat.slice(0,5)).map((c,i) => (
-                <div key={c.id} onClick={() => navigate(`/course/${c.id}`)} style={{ background:'#fff', borderRadius:12, padding:'12px 15px', cursor:'pointer', border:`1px solid ${i===0 ? B.gold:B.border}`, display:'flex', alignItems:'center', gap:12, transition:'all 0.15s' }}
+                <div key={c.id} onClick={() => navigate(`/course/${c.id}`)} style={{ background:B.white, borderRadius:12, padding:'12px 15px', cursor:'pointer', border:`1px solid ${i===0 ? B.gold:B.border}`, display:'flex', alignItems:'center', gap:12, transition:'all 0.15s' }}
                   onMouseEnter={e => e.currentTarget.style.boxShadow='0 4px 16px rgba(27,48,84,0.08)'}
                   onMouseLeave={e => e.currentTarget.style.boxShadow='none'}>
                   <div style={{ width:34, height:34, borderRadius:8, background:i===0 ? B.gold:B.feedBg, display:'flex', alignItems:'center', justifyContent:'center', fontWeight:900, fontSize:i===0?14:12, color:i===0 ? B.navy:B.textMid, fontFamily:serif, flexShrink:0 }}>{i===0 ? '🥇':i+1}</div>

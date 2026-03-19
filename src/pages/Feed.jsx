@@ -193,11 +193,11 @@ export default function Feed() {
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[...Array(3)].map((_, i) => (
-            <div key={i} style={{ background: '#fff', borderRadius: 16, height: 240, border: `1px solid ${B.border}`, opacity: 0.5 }}/>
+            <div key={i} style={{ background: B.white, borderRadius: 16, height: 240, border: `1px solid ${B.border}`, opacity: 0.5 }}/>
           ))}
         </div>
       ) : rounds.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 0', background: '#fff', borderRadius: 16, border: `1px solid ${B.border}` }}>
+        <div style={{ textAlign: 'center', padding: '60px 0', background: B.white, borderRadius: 16, border: `1px solid ${B.border}` }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>⛳</div>
           <div style={{ fontSize: 18, fontWeight: 700, color: B.textNavy, fontFamily: serif, marginBottom: 8 }}>No rounds yet</div>
           <div style={{ fontSize: 13, color: B.textSoft, fontFamily: sans, marginBottom: 20 }}>Be the first to log a round</div>
@@ -215,7 +215,7 @@ export default function Feed() {
             const avatarColors = [B.navy, B.green, '#5a4a2a']
 
             return (
-              <div key={round.id} style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: `1px solid ${B.border}` }}>
+              <div key={round.id} style={{ background: B.white, borderRadius: 16, overflow: 'hidden', border: `1px solid ${B.border}` }}>
 
                 {/* Course header strip */}
                 <div
