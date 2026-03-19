@@ -98,7 +98,7 @@ export default function App() {
   const nav = (tab) => navigate(tab === 'discover' ? '/' : `/${tab}`)
 
   return (
-    <div style={{ fontFamily:sans, background:B.feedBg, minHeight:'100vh' }}>
+    <div style={{ fontFamily:sans, background:B.feedBg, minHeight:'-webkit-fill-available' }}>
 
       {!hideNav && (
         <div style={{ background:B.navy, borderBottom:'1px solid rgba(240,232,213,0.08)', padding:'0 10px', display:'flex', alignItems:'center', justifyContent:'space-between', height:58, position:'sticky', top:0, zIndex:300 }}>
