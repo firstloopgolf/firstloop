@@ -8,13 +8,11 @@ export const serif = "'DM Serif Display', Georgia, serif"
 export const sans  = "'DM Sans', system-ui, sans-serif"
 
 // ── Light Mode ────────────────────────────────────────────────
-// Warm cream base, green-dominant, gold accents.
-// Feels like a members' scorecard in afternoon light.
 export const lightColors = {
   // Primary surfaces
-  navy:       '#1a2e1a',   // deep green — replaces old navy everywhere
-  navyLight:  '#2d5a27',   // mid green
-  navyDark:   '#0f1f0f',   // darkest green
+  navy:       '#1a2e1a',
+  navyLight:  '#2d5a27',
+  navyDark:   '#0f1f0f',
 
   // Brand greens
   green:      '#2d5a27',
@@ -41,33 +39,31 @@ export const lightColors = {
 }
 
 // ── Dark Mode ─────────────────────────────────────────────────
-// Near-black with green tint. Gold does more work.
-// Feels like a course at dusk — confident, editorial.
 export const darkColors = {
   // Primary surfaces
-  navy:       '#151f15',   // dark green surface — nav, hero, banners
-  navyLight:  '#1a2e1a',   // slightly lighter surface
-  navyDark:   '#0e140e',   // deepest — page background
+  navy:       '#151f15',
+  navyLight:  '#1a2e1a',
+  navyDark:   '#0e140e',
 
   // Brand greens
   green:      '#2d5a27',
-  greenLight: '#6db562',   // brighter in dark — needs more contrast
+  greenLight: '#6db562',
 
-  // Gold (unchanged — gold pops equally in both modes)
+  // Gold
   gold:       '#c9a84c',
   goldLight:  '#e8c96d',
   goldPale:   'rgba(201,168,76,0.12)',
 
   // Backgrounds
-  cream:      '#e8e4da',   // warm off-white text on dark surfaces
+  cream:      '#e8e4da',   // warm off-white — primary text on dark
   creamDark:  '#1a261a',   // dark card surface
-  white:      '#1a261a',   // "white" cards are dark in dark mode
+  white:      '#1a261a',   // cards in dark mode
   feedBg:     '#0e140e',   // page base
 
-  // Text
-  textNavy:   '#e8e4da',   // primary text — warm off-white
-  textMid:    '#9a9080',   // secondary
-  textSoft:   '#5a5448',   // muted
+  // Text — all bumped up significantly for dark mode legibility
+  textNavy:   '#e8e4da',   // primary — warm off-white (unchanged)
+  textMid:    '#b8b0a0',   // secondary — was #9a9080, now much more readable
+  textSoft:   '#8a8070',   // muted — was #5a5448 (nearly invisible), now legible
 
   // Border
   border:     'rgba(74,144,64,0.2)',
