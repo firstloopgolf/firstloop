@@ -55,8 +55,10 @@ function StepProfile({ onNext, profile }) {
   const { B, serif, sans } = useTheme()
   const inputStyle = getInputStyle(B, sans)
   const { user, fetchProfile } = useAuth()
-  const [username,   setUsername]   = useState(profile?.username   || '')
-  const [fullName,   setFullName]   = useState(profile?.full_name  || '')
+  // Username may already be set from signup — check profile first, then user_metadata
+  const existingUsername = profile?.username || user?.user_metadata?.username || ''
+  const [username,   setUsername]   = useState(existingUsername)
+  const [fullName,   setFullName]   = useState(profile?.full_name  || user?.user_metadata?.full_name || '')
   const [homeCourse, setHomeCourse] = useState(profile?.home_course|| '')
   const [handicap,   setHandicap]   = useState(profile?.handicap   || '')
   const [saving,     setSaving]     = useState(false)
@@ -97,13 +99,15 @@ function StepProfile({ onNext, profile }) {
       )}
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <div>
-          <label style={{ fontSize: 11, fontWeight: 700, color: 'rgba(240,232,213,0.5)', fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            Username *
-          </label>
-          <input value={username} onChange={e => setUsername(e.target.value)}
-            placeholder="e.g. tigerw" style={inputStyle} autoCapitalize="none"/>
-        </div>
+        {!existingUsername && (
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: 'rgba(240,232,213,0.5)', fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              Username *
+            </label>
+            <input value={username} onChange={e => setUsername(e.target.value)}
+              placeholder="e.g. tigerw" style={inputStyle} autoCapitalize="none"/>
+          </div>
+        )}
 
         <div>
           <label style={{ fontSize: 11, fontWeight: 700, color: 'rgba(240,232,213,0.5)', fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
@@ -481,9 +485,20 @@ export default function Onboarding() {
     }
   }
 
+  useEffect(() => {
+    const prevBody = document.body.style.background
+    const prevHtml = document.documentElement.style.background
+    document.body.style.background = B.navy
+    document.documentElement.style.background = B.navy
+    return () => {
+      document.body.style.background = prevBody
+      document.documentElement.style.background = prevHtml
+    }
+  }, [B.navy])
+
   return (
     <div style={{
-      minHeight: '-webkit-fill-available', background: B.navy,
+      minHeight: '100dvh', background: B.navy,
       display: 'flex', flexDirection: 'column', justifyContent: 'center',
       padding: '40px 0',
     }}>
