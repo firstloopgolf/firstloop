@@ -10,34 +10,47 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Grab any existing session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id)
-      else setLoading(false)
-    })
-
+    // Set up the auth state listener first — always
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
 
       if (session?.user) {
         fetchProfile(session.user.id)
 
-        // When a user clicks their confirmation email, Supabase fires SIGNED_IN
-        // with the tokens in the URL hash. We detect this and send them to onboarding.
         if (event === 'SIGNED_IN') {
-          const hash = window.location.hash
-          // If tokens are in the URL hash it means they just confirmed their email
-          if (hash && hash.includes('access_token')) {
-            // Clean the URL then redirect to onboarding
-            window.history.replaceState(null, '', window.location.pathname)
+          // Check if this came from an email confirmation link
+          const params = new URLSearchParams(window.location.hash.replace('#', '?'))
+          if (params.get('type') === 'signup') {
+            window.history.replaceState(null, '', '/onboarding')
             window.location.href = '/onboarding'
+            return
           }
         }
       } else {
         setProfile(null)
         setLoading(false)
       }
+    })
+
+    // If the URL contains email confirmation tokens, call setSession to
+    // exchange them for a live session — this triggers onAuthStateChange above
+    const hash = window.location.hash
+    if (hash && hash.includes('access_token')) {
+      const params = new URLSearchParams(hash.replace('#', '?'))
+      const accessToken  = params.get('access_token')
+      const refreshToken = params.get('refresh_token')
+      if (accessToken && refreshToken) {
+        supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+        // setSession triggers onAuthStateChange, which handles the redirect
+        return () => subscription.unsubscribe()
+      }
+    }
+
+    // Normal page load — grab existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      if (session?.user) fetchProfile(session.user.id)
+      else setLoading(false)
     })
 
     return () => subscription.unsubscribe()
