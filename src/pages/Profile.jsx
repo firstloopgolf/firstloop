@@ -6,6 +6,7 @@ import { COURSES } from '../lib/data.js'
 import { useTheme } from '../contexts/ThemeContext.jsx'
 import { Pill } from '../components/UI.jsx'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
+import GolfPassport from '../components/GolfPassport.jsx'
 import CourseSuggestions from '../components/CourseSuggestions.jsx'
 
 export default function Profile() {
@@ -19,6 +20,7 @@ export default function Profile() {
   const [saveMsg, setSaveMsg]       = useState('')
   const [shareRound, setShareRound] = useState(null)
   const [shareCourse, setShareCourse] = useState(null)
+  const [showPassport, setShowPassport] = useState(false)
 
   // Edit form state
   const [fullName, setFullName]     = useState('')
@@ -99,6 +101,13 @@ export default function Profile() {
           onClose={() => { setShareRound(null); setShareCourse(null) }}
         />
       )}
+      {showPassport && (
+        <GolfPassport
+          profile={profile}
+          rounds={rounds}
+          onClose={() => setShowPassport(false)}
+        />
+      )}
 
       {/* ── Profile Header ── */}
       <div style={{ background: B.navy, borderRadius: 20, padding: '26px 22px', marginBottom: 18 }}>
@@ -117,9 +126,14 @@ export default function Profile() {
               {profile?.handicap != null && <Pill gold>⛳ Hdcp: {profile.handicap}</Pill>}
               {profile?.location  && <Pill gold>📍 {profile.location}</Pill>}
             </div>
-          </div>
-        </div>
+                  </div>
 
+        <button onClick={() => setShowPassport(true)}
+          style={{ width: '100%', marginTop: 14, background: 'rgba(201,168,76,0.12)', color: B.gold, border: '1px solid rgba(201,168,76,0.25)', borderRadius: 11, padding: '10px 0', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: serif, letterSpacing: '0.02em' }}>
+          🗂 Share my Golf Passport
+        </button>
+      </div>
+      
         {/* Stats grid — now shows Courses, Avg Score, States, #1 Course */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
           {[
