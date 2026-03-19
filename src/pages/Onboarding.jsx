@@ -25,14 +25,18 @@ const SUGGESTED = [
 ]
 
 // ── Shared styles ─────────────────────────────────────────────────────────────
-const inputStyle = {
-  width: '100%', padding: '13px 15px', borderRadius: 12,
-  border: '1.5px solid rgba(240,232,213,0.15)', fontSize: 15,
-  fontFamily: sans, color: B.cream, outline: 'none',
-  background: 'rgba(255,255,255,0.06)', boxSizing: 'border-box',
+// inputStyle is a function so B and sans are resolved inside components, not at module level
+function getInputStyle(B, sans) {
+  return {
+    width: '100%', padding: '13px 15px', borderRadius: 12,
+    border: '1.5px solid rgba(240,232,213,0.15)', fontSize: 15,
+    fontFamily: sans, color: B.cream, outline: 'none',
+    background: 'rgba(255,255,255,0.06)', boxSizing: 'border-box',
+  }
 }
 
 function ProgressDots({ current, total }) {
+  const { B, serif, sans } = useTheme()
   return (
     <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 32 }}>
       {Array.from({ length: total }).map((_, i) => (
@@ -48,6 +52,8 @@ function ProgressDots({ current, total }) {
 
 // ── Step 1: Profile ───────────────────────────────────────────────────────────
 function StepProfile({ onNext, profile }) {
+  const { B, serif, sans } = useTheme()
+  const inputStyle = getInputStyle(B, sans)
   const { user, fetchProfile } = useAuth()
   const [username,   setUsername]   = useState(profile?.username   || '')
   const [fullName,   setFullName]   = useState(profile?.full_name  || '')
@@ -139,6 +145,8 @@ function StepProfile({ onNext, profile }) {
 
 // ── Step 2: Log first courses ─────────────────────────────────────────────────
 function StepLogCourses({ onNext, onSkip, addedCourses, setAddedCourses }) {
+  const { B, serif, sans } = useTheme()
+  const inputStyle = getInputStyle(B, sans)
   const { user } = useAuth()
   const [search,        setSearch]        = useState('')
   const [results,       setResults]       = useState([])
@@ -273,6 +281,7 @@ function StepLogCourses({ onNext, onSkip, addedCourses, setAddedCourses }) {
 
 // ── Step 3: Elo Comparison ────────────────────────────────────────────────────
 function StepElo({ addedCourses, onComplete }) {
+  const { B, serif, sans } = useTheme()
   const { user } = useAuth()
   const [eloScores, setEloScores] = useState(() => {
     const s = {}
@@ -402,6 +411,7 @@ function StepElo({ addedCourses, onComplete }) {
 
 // ── Step 4: Follow Suggested Golfers ─────────────────────────────────────────
 function StepFollow({ onFinish }) {
+  const { B, serif, sans } = useTheme()
   const [followed, setFollowed] = useState({})
 
   return (
