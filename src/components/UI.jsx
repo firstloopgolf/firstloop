@@ -72,7 +72,7 @@ export function RatingChip({ value }) {
 export function Bar({ value, color }) {
   const { B, serif, sans } = useTheme()
   return (
-    <div style={{ height:5, borderRadius:3, background:'#E8E0D0', overflow:'hidden', flex:1 }}>
+    <div style={{ height:5, borderRadius:3, background:'rgba(180,170,150,0.25)', overflow:'hidden', flex:1 }}>
       <div style={{ height:'100%', width:`${(value/10)*100}%`, background:color, borderRadius:3 }}/>
     </div>
   )
@@ -136,14 +136,14 @@ export function CourseCard({ course, onClick, row }) {
           <div style={{ flex:1 }}>
             <div style={{ fontSize:11, color:B.textSoft, fontFamily:sans, marginBottom:4 }}>{course.reviews.toLocaleString()} ratings</div>
             <div style={{ display:'flex', flexDirection:'column', gap:3 }}>
-              <Bar value={course.conditions} color={B.green}/>
-              <Bar value={course.value}      color={B.navy}/>
-              <Bar value={course.vibes}      color={B.gold}/>
+              <Bar value={course.conditions} color={B.greenLight}/>
+              <Bar value={course.value}      color={B.gold}/>
+              <Bar value={course.vibes}      color='#a07840'/>
             </div>
           </div>
         </div>
         <div style={{ display:'flex', gap:6 }}>
-          {[['Conditions',course.conditions,B.green],['Value',course.value,B.navy],['Facilities',course.vibes,B.gold]].map(([l,v,c]) => (
+          {[['Conditions',course.conditions,B.greenLight],['Value',course.value,B.gold],['Facilities',course.vibes,'#a07840']].map(([l,v,c]) => (
             <div key={l} style={{ flex:1, background:B.feedBg, borderRadius:8, padding:'6px 4px', textAlign:'center', border:`1px solid ${B.border}` }}>
               <div style={{ fontSize:13, fontWeight:800, color:c, fontFamily:serif }}>{v.toFixed(1)}</div>
               <div style={{ fontSize:9, color:B.textSoft, fontFamily:sans, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em' }}>{l}</div>
