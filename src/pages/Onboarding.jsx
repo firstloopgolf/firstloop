@@ -17,11 +17,11 @@ function calcElo(winR, loseR) {
 
 // ── Dummy golfers for Step 4 ─────────────────────────────────────────────────
 const SUGGESTED = [
-  { id: 'd1', name: 'Jack Nicklaus',  username: 'goldenbear18', location: 'North Palm Beach, FL', emoji: '🐻' },
-  { id: 'd2', name: 'Jordan Spieth',  username: 'jspieth',      location: 'Dallas, TX',            emoji: '🏌️' },
-  { id: 'd3', name: 'Dustin Johnson', username: 'djohnson',     location: 'Jupiter, FL',           emoji: '💪' },
-  { id: 'd4', name: 'Brooks Koepka',  username: 'bkoepka',      location: 'Palm Beach, FL',        emoji: '⚡' },
-  { id: 'd5', name: 'Xander Schauffele', username: 'xschauffele', location: 'San Diego, CA',      emoji: '🎯' },
+  { id: 'd1', name: 'The Scratch Golfer',    username: 'scratchgolfer',   location: 'Augusta, GA',          emoji: '🏆' },
+  { id: 'd2', name: 'Fairway Philosopher',   username: 'fairwayphil',     location: 'Pebble Beach, CA',     emoji: '🌊' },
+  { id: 'd3', name: 'The Weekend Warrior',   username: 'weekendwarrior',  location: 'Scottsdale, AZ',       emoji: '⛳' },
+  { id: 'd4', name: 'Links Purist',          username: 'linkspurist',     location: 'Bandon, OR',           emoji: '🌬️' },
+  { id: 'd5', name: 'The Club Collector',    username: 'clubcollector',   location: 'Pinehurst, NC',        emoji: '🎯' },
 ]
 
 // ── Shared styles ─────────────────────────────────────────────────────────────
@@ -297,17 +297,31 @@ function StepElo({ addedCourses, onComplete }) {
   const [compNum,     setCompNum]       = useState(0)
   const [animating,   setAnimating]     = useState(null)
   const [done,        setDone]          = useState(false)
-  const total = Math.min(3, addedCourses.length - 1)
 
-  useEffect(() => { pickPair(eloScores, []) }, [])
+  // Generate all round-robin pairs upfront: A vs B, A vs C, B vs C
+  const allPairs = useState(() => {
+    const pairs = []
+    for (let i = 0; i < addedCourses.length; i++) {
+      for (let j = i + 1; j < addedCourses.length; j++) {
+        pairs.push({ a: addedCourses[i], b: addedCourses[j] })
+      }
+    }
+    return pairs
+  })[0]
+  const total = allPairs.length
 
-  function pickPair(scores, done) {
-    const usedA = done.map(d => d.aId)
-    const usedB = done.map(d => d.bId)
-    const available = addedCourses.filter(c => !usedA.includes(c.roundId) && !usedB.includes(c.roundId))
-    if (available.length < 2 || done.length >= total) { finish(scores, done); return }
-    const [a, b] = available.sort(() => Math.random() - 0.5).slice(0, 2)
-    setCurrentPair({ a, b })
+  useEffect(() => {
+    if (allPairs.length === 0) { finish(eloScores, []); return }
+    setCurrentPair(allPairs[0])
+  }, [])
+
+  function pickPair(doneComps) {
+    const nextIndex = doneComps.length
+    if (nextIndex >= allPairs.length) {
+      // All pairs done — but wait for state update via handleChoice
+      return
+    }
+    setCurrentPair(allPairs[nextIndex])
   }
 
   function handleChoice(winnerId, loserId) {
@@ -323,7 +337,11 @@ function StepElo({ addedCourses, onComplete }) {
       setComparisons(newComps)
       setAnimating(null)
       setCompNum(n => n + 1)
-      if (newComps.length >= total) { finish(s, newComps) } else { pickPair(s, newComps) }
+      if (newComps.length >= total) {
+        finish(s, newComps)
+      } else {
+        pickPair(newComps)
+      }
     }, 500)
   }
 
