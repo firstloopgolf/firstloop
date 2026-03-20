@@ -23,19 +23,25 @@ export default function Profile() {
   const [showPassport, setShowPassport] = useState(false)
 
   // Edit form state
-  const [fullName, setFullName]     = useState('')
-  const [username, setUsername]     = useState('')
-  const [location, setLocation]     = useState('')
-  const [handicap, setHandicap]     = useState('')
+  const [fullName,       setFullName]       = useState('')
+  const [username,       setUsername]       = useState('')
+  const [location,       setLocation]       = useState('')
+  const [homeCourse,     setHomeCourse]     = useState('')
+  const [handicap,       setHandicap]       = useState('')
+  const [showHomeCourse, setShowHomeCourse] = useState(true)
+
+  const STATES = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']
 
   useEffect(() => { fetchRounds() }, [user])
 
   useEffect(() => {
     if (profile) {
-      setFullName(profile.full_name || '')
-      setUsername(profile.username  || '')
-      setLocation(profile.location  || '')
-      setHandicap(profile.handicap  || '')
+      setFullName(profile.full_name       || '')
+      setUsername(profile.username        || '')
+      setLocation(profile.location        || '')
+      setHomeCourse(profile.home_course   || '')
+      setHandicap(profile.handicap        || '')
+      setShowHomeCourse(profile.show_home_course !== false)
     }
   }, [profile])
 
@@ -58,10 +64,12 @@ export default function Profile() {
     const { error } = await supabase
       .from('profiles')
       .update({
-        full_name: fullName,
-        username:  username,
-        location:  location,
-        handicap:  handicap ? parseFloat(handicap) : null,
+        full_name:        fullName,
+        username:         username,
+        location:         location,
+        home_course:      homeCourse,
+        handicap:         handicap ? parseFloat(handicap) : null,
+        show_home_course: showHomeCourse,
       })
       .eq('id', user.id)
     if (error) {
@@ -125,6 +133,9 @@ export default function Profile() {
             <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
               {profile?.handicap != null && <Pill gold>⛳ Hdcp: {profile.handicap}</Pill>}
               {profile?.location  && <Pill gold>📍 {profile.location}</Pill>}
+              {profile?.home_course && profile?.show_home_course !== false && (
+                <Pill gold>🏠 {profile.home_course}</Pill>
+              )}
             </div>
           </div>
         </div>
@@ -381,8 +392,38 @@ export default function Profile() {
               <input value={username} onChange={e => setUsername(e.target.value)} placeholder="e.g. treyc" style={inputStyle}/>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: B.textMid, fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Location</label>
-              <input value={location} onChange={e => setLocation(e.target.value)} placeholder="e.g. Birmingham, AL" style={inputStyle}/>
+              <label style={{ fontSize: 12, fontWeight: 600, color: B.textMid, fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>State</label>
+              <select value={location} onChange={e => setLocation(e.target.value)} style={inputStyle}>
+                <option value="">Select your state</option>
+                {STATES.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: B.textMid, fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Home Course</label>
+              <input value={homeCourse} onChange={e => setHomeCourse(e.target.value)} placeholder="e.g. Augusta National" style={inputStyle}/>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: B.feedBg, borderRadius: 10, border: `1px solid ${B.border}` }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: B.textNavy, fontFamily: sans }}>Show home course on profile</div>
+                  <div style={{ fontSize: 11, color: B.textSoft, fontFamily: sans, marginTop: 2 }}>Visible to other golfers who view your profile</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowHomeCourse(p => !p)}
+                  style={{
+                    width: 44, height: 24, borderRadius: 12, border: 'none',
+                    background: showHomeCourse ? B.green : B.border,
+                    position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0,
+                  }}
+                >
+                  <div style={{
+                    position: 'absolute', top: 3, left: showHomeCourse ? 23 : 3,
+                    width: 18, height: 18, borderRadius: '50%', background: '#fff',
+                    transition: 'left 0.2s',
+                  }}/>
+                </button>
+              </div>
             </div>
             <div style={{ marginBottom: 24 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: B.textMid, fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Handicap Index</label>
