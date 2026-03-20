@@ -161,7 +161,7 @@ useEffect(() => {
         )}
 
         {/* Comment input */}
-        {user ? getInitials(
+        {user ? (
           <form onSubmit={postComment} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             {/* Own avatar */}
             <div style={{
@@ -169,7 +169,7 @@ useEffect(() => {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: serif, fontSize: 10, fontWeight: 900, color: B.navy, flexShrink: 0,
             }}>
-              {(profile?.full_name || profile?.username || 'G')}
+              {getInitials(profile?.full_name || profile?.username || 'G')}
             </div>
             <input
               ref={inputRef}

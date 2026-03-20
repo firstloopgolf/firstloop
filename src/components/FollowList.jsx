@@ -119,8 +119,8 @@ export default function FollowList({ userId, mode, onClose }) {
                 {mode === 'followers' ? 'Share your profile to get followers' : 'Find golfers to follow'}
               </div>
             </div>
-          ) : list.mapgetInitials(p => {
-            const initials = (p.full_name || p.username || 'G')
+          ) : list.map(p => {
+            const initials = getInitials(p.full_name || p.username || 'G')
             const color = avatarColors[(p.username?.charCodeAt(0) || 0) % avatarColors.length]
             const isMe = user?.id === p.id
             const isFollowingThem = following.has(p.id)

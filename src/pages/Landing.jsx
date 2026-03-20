@@ -11,17 +11,17 @@ export default function Landing() {
     <div style={{ fontFamily:sans, background:B.navy, minHeight:'-webkit-fill-available', overflowX:'hidden' }}>
 
       {/* Nav */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 28px', maxWidth:1100, margin:'0 auto' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', maxWidth:1100, margin:'0 auto' }}>
         <Logo size="md" theme="navy"/>
         <div style={{ display:'flex', gap:10 }}>
           <button onClick={() => navigate('/auth')}
-            style={{ background:'transparent', border:`1px solid rgba(240,232,213,0.25)`, color:'rgba(240,232,213,0.8)', borderRadius:10, padding:'9px 20px', fontWeight:600, cursor:'pointer', fontSize:14, fontFamily:sans, transition:'all 0.15s' }}
+            style={{ background:'transparent', border:`1px solid rgba(240,232,213,0.25)`, color:'rgba(240,232,213,0.8)', borderRadius:10, padding:'8px 14px', fontWeight:600, cursor:'pointer', fontSize:13, fontFamily:sans, transition:'all 0.15s' }}
             onMouseEnter={e => e.currentTarget.style.borderColor='rgba(240,232,213,0.5)'}
             onMouseLeave={e => e.currentTarget.style.borderColor='rgba(240,232,213,0.25)'}>
             Sign In
           </button>
           <button onClick={() => navigate('/auth')}
-            style={{ background:B.gold, border:'none', color:B.navy, borderRadius:10, padding:'9px 20px', fontWeight:800, cursor:'pointer', fontSize:14, fontFamily:sans, transition:'all 0.15s' }}
+            style={{ background:B.gold, border:'none', color:B.navy, borderRadius:10, padding:'8px 14px', fontWeight:800, cursor:'pointer', fontSize:13, fontFamily:sans, transition:'all 0.15s' }}
             onMouseEnter={e => e.currentTarget.style.background=B.goldLight}
             onMouseLeave={e => e.currentTarget.style.background=B.gold}>
             Get Started →
@@ -30,9 +30,9 @@ export default function Landing() {
       </div>
 
       {/* Hero */}
-      <div style={{ maxWidth:1100, margin:'0 auto', padding:'56px 28px 72px', position:'relative' }}>
+      <div style={{ maxWidth:1100, margin:'0 auto', padding:'32px 20px 48px', position:'relative' }}>
         <div style={{ position:'absolute', top:-80, left:'50%', transform:'translateX(-50%)', width:700, height:700, borderRadius:'50%', background:'rgba(196,150,58,0.05)', pointerEvents:'none' }}/>
-        <div style={{ position:'relative', display:'grid', gridTemplateColumns:'1fr 1fr', gap:60, alignItems:'center' }}>
+        <div style={{ position:'relative', display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:40, alignItems:'center' }}>
 
           {/* Left — text */}
           <div>
@@ -107,7 +107,7 @@ export default function Landing() {
       </div>
 
       {/* How it works */}
-      <div style={{ maxWidth:1100, margin:'0 auto', padding:'72px 28px' }}>
+      <div style={{ maxWidth:1100, margin:'0 auto', padding:'48px 20px' }}>
         <div style={{ textAlign:'center', marginBottom:48 }}>
           <h2 style={{ color:B.cream, fontSize:32, fontWeight:900, fontFamily:serif, margin:'0 0 12px' }}>How First Loop works</h2>
           <p style={{ color:'rgba(240,232,213,0.5)', fontSize:15, fontFamily:sans, maxWidth:480, margin:'0 auto' }}>
@@ -134,8 +134,8 @@ export default function Landing() {
 
       {/* Community feed preview */}
       <div style={{ maxWidth:1100, margin:'0 auto', padding:'0 28px 72px' }}>
-        <div style={{ background:'rgba(240,232,213,0.04)', border:`1px solid rgba(240,232,213,0.08)`, borderRadius:24, padding:'48px 44px' }}>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:48, alignItems:'center' }}>
+        <div style={{ background:'rgba(240,232,213,0.04)', border:`1px solid rgba(240,232,213,0.08)`, borderRadius:24, padding:'32px 20px' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))', gap:32, alignItems:'center' }}>
             <div>
               <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(196,150,58,0.12)', borderRadius:999, padding:'4px 14px', marginBottom:16 }}>
                 <span style={{ color:B.gold, fontSize:12, fontWeight:700, fontFamily:sans }}>📋 COMMUNITY FEED</span>
@@ -181,7 +181,7 @@ export default function Landing() {
       </div>
 
       {/* Final CTA */}
-      <div style={{ maxWidth:680, margin:'0 auto', padding:'0 28px 80px', textAlign:'center' }}>
+      <div style={{ maxWidth:680, margin:'0 auto', padding:'0 20px 60px', textAlign:'center' }}>
         <h2 style={{ color:B.cream, fontSize:32, fontWeight:900, fontFamily:serif, margin:'0 0 14px' }}>
           Ready to start your First Loop?
         </h2>
@@ -200,7 +200,7 @@ export default function Landing() {
       <div style={{ borderTop:`1px solid rgba(240,232,213,0.08)`, padding:'24px 28px' }}>
         <div style={{ maxWidth:1100, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
           <Logo size="sm" theme="navy"/>
-          <div style={{ display:'flex', gap:24 }}>
+          <div style={{ display:'flex', gap:16, flexWrap:'wrap' }}>
             {[['Discover','/discover'],['Rankings','/rankings'],['Map','/map'],['Submit a Course','/submit']].map(([label, path]) => (
               <button key={label} onClick={() => navigate(path)}
                 style={{ background:'none', border:'none', color:'rgba(240,232,213,0.35)', cursor:'pointer', fontSize:13, fontFamily:sans, padding:0, transition:'color 0.15s' }}
