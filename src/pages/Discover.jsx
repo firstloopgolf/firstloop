@@ -124,7 +124,7 @@ export default function Discover() {
             Find Your Next<br/><span style={{ color: B.gold }}>Great Round</span>
           </h1>
           <p style={{ color: 'rgba(240,232,213,0.65)', margin: '0 0 16px', fontSize: 13, fontFamily: sans, lineHeight: 1.65 }}>
-            Thousands of courses across America — rated by real golfers.
+            9,000+ courses across all 50 states — rated by real golfers.
           </p>
           {/* Search bar */}
           <div style={{ position: 'relative' }}>

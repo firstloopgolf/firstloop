@@ -24,7 +24,7 @@ export default function Landing() {
             style={{ background:B.gold, border:'none', color:B.navy, borderRadius:10, padding:'9px 20px', fontWeight:800, cursor:'pointer', fontSize:14, fontFamily:sans, transition:'all 0.15s' }}
             onMouseEnter={e => e.currentTarget.style.background=B.goldLight}
             onMouseLeave={e => e.currentTarget.style.background=B.gold}>
-            Join Free →
+            Get Started →
           </button>
         </div>
       </div>
@@ -52,7 +52,7 @@ export default function Landing() {
                 style={{ background:B.gold, border:'none', color:B.navy, borderRadius:12, padding:'15px 32px', fontWeight:800, cursor:'pointer', fontSize:16, fontFamily:serif, transition:'all 0.15s' }}
                 onMouseEnter={e => e.currentTarget.style.background=B.goldLight}
                 onMouseLeave={e => e.currentTarget.style.background=B.gold}>
-                Start Tracking Free →
+                Start for Free →
               </button>
               <button onClick={() => navigate('/discover')}
                 style={{ background:'rgba(240,232,213,0.08)', border:`1px solid rgba(240,232,213,0.15)`, color:B.cream, borderRadius:12, padding:'15px 28px', fontWeight:600, cursor:'pointer', fontSize:15, fontFamily:sans, transition:'all 0.15s' }}
@@ -87,11 +87,11 @@ export default function Landing() {
       <div style={{ borderTop:`1px solid rgba(240,232,213,0.08)`, borderBottom:`1px solid rgba(240,232,213,0.08)`, padding:'28px 28px' }}>
         <div style={{ maxWidth:1100, margin:'0 auto', display:'flex', justifyContent:'space-around', flexWrap:'wrap', gap:20 }}>
           {[
-            ['2,900+', 'Courses Rated'],
-            ['9',      'States Covered'],
+            ['9,000+', 'Courses Rated'],
+            ['50',     'States Covered'],
             ['Top 100','National Rankings'],
             ['Top 20', 'Per State'],
-            ['Free',   'Always Free to Use'],
+            ['Free',   'Free to Get Started'],
           ].map(([num, label]) => (
             <div key={label} style={{ textAlign:'center' }}>
               <div style={{ color:B.gold, fontSize:28, fontWeight:900, fontFamily:serif, lineHeight:1 }}>{num}</div>
@@ -116,8 +116,8 @@ export default function Landing() {
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:24 }}>
           {[
-            ['1', 'Create your free account',    'Sign up in 30 seconds. No credit card needed, ever.'],
-            ['2', 'Find a course you played',    'Search from 2,900+ rated courses across 9 states and growing.'],
+            ['1', 'Create your free account',    'Sign up in 30 seconds. Free to get started.'],
+            ['2', 'Find a course you played',    'Search from 9,000+ rated courses across all 50 states and growing.'],
             ['3', 'Log your round & rate it',    'Add your score and rate conditions, value, and facilities.'],
             ['4', 'Discover what to play next',  'Community rankings and personalized suggestions guide your next round.'],
           ].map(([num, title, desc]) => (
@@ -186,13 +186,13 @@ export default function Landing() {
           Ready to start your First Loop?
         </h2>
         <p style={{ color:'rgba(240,232,213,0.55)', fontSize:16, fontFamily:sans, lineHeight:1.7, margin:'0 0 32px' }}>
-          Join thousands of golfers already rating and ranking courses across America. It's free, it's honest, and it's built for golfers by golfers.
+          Join golfers already rating and ranking courses across all 50 states. Honest reviews, real scores, and a community built for people who take their game seriously.
         </p>
         <button onClick={() => navigate('/auth')}
           style={{ background:B.gold, border:'none', color:B.navy, borderRadius:14, padding:'17px 40px', fontWeight:800, cursor:'pointer', fontSize:17, fontFamily:serif, transition:'all 0.15s' }}
           onMouseEnter={e => e.currentTarget.style.background=B.goldLight}
           onMouseLeave={e => e.currentTarget.style.background=B.gold}>
-          Create Your Free Account →
+          Create Your Account →
         </button>
       </div>
 
