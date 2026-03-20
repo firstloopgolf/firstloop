@@ -34,8 +34,8 @@ export default function PublicProfile() {
         .eq('user_id', userId)
         .order('personal_rank', { ascending: true })
         .limit(20),
-      supabase.from('follows').select('follower_id', { count: 'exact', head: false }).eq('following_id', userId),
-      supabase.from('follows').select('following_id', { count: 'exact', head: false }).eq('follower_id', userId),
+      supabase.from('follows').select('follower_id').eq('following_id', userId),
+      supabase.from('follows').select('following_id').eq('follower_id', userId),
     ])
 
     setProfile(prof)
@@ -45,13 +45,12 @@ export default function PublicProfile() {
 
     // Check if current user follows this profile
     if (user) {
-      const { data: myFollow } = await supabase
+      const { data: myFollowData } = await supabase
         .from('follows')
         .select('follower_id')
         .eq('follower_id', user.id)
         .eq('following_id', userId)
-        .maybeSingle()
-      setIsFollowing(!!myFollow)
+      setIsFollowing((myFollowData || []).length > 0)
     }
 
     setLoading(false)
@@ -61,13 +60,15 @@ export default function PublicProfile() {
     if (!user) { navigate('/auth'); return }
     setFollowLoading(true)
     if (isFollowing) {
-      await supabase.from('follows').delete()
+      const { error } = await supabase.from('follows').delete()
         .eq('follower_id', user.id)
         .eq('following_id', userId)
+      if (error) { console.error('Unfollow error:', error.message); setFollowLoading(false); return }
       setIsFollowing(false)
       setFollowerCount(c => Math.max(0, c - 1))
     } else {
-      await supabase.from('follows').insert({ follower_id: user.id, following_id: userId })
+      const { error } = await supabase.from('follows').insert({ follower_id: user.id, following_id: userId })
+      if (error) { console.error('Follow error:', error.message); setFollowLoading(false); return }
       setIsFollowing(true)
       setFollowerCount(c => c + 1)
     }

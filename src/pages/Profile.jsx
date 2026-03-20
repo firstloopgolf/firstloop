@@ -38,6 +38,13 @@ export default function Profile() {
 
   useEffect(() => { fetchRounds(); fetchFollowCounts() }, [user])
 
+  // Re-fetch counts when user navigates back to this page
+  useEffect(() => {
+    const handler = () => { if (document.visibilityState === 'visible') fetchFollowCounts() }
+    document.addEventListener('visibilitychange', handler)
+    return () => document.removeEventListener('visibilitychange', handler)
+  }, [user])
+
   useEffect(() => {
     if (profile) {
       setFullName(profile.full_name       || '')
