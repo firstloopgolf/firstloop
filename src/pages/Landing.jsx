@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '../contexts/ThemeContext.jsx'
 import { Logo } from '../components/UI.jsx'
+import FoundingMemberBanner from '../components/FoundingMemberBanner.jsx'
 
 export default function Landing() {
   const { B, serif, sans } = useTheme()
@@ -98,6 +99,11 @@ export default function Landing() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Founding Member Banner */}
+      <div style={{ maxWidth:1100, margin:'0 auto', padding:'48px 28px 0' }}>
+        <FoundingMemberBanner variant="full" />
       </div>
 
       {/* How it works */}

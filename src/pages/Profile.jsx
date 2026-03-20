@@ -11,6 +11,14 @@ import CourseSuggestions from '../components/CourseSuggestions.jsx'
 import FindFriends from '../components/FindFriends.jsx'
 import FollowList from '../components/FollowList.jsx'
 
+function getInitials(name) {
+  if (!name) return 'G'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
+
+
 export default function Profile() {
   const { B, serif, sans } = useTheme()
   const navigate                    = useNavigate()
@@ -24,6 +32,7 @@ export default function Profile() {
   const [shareCourse, setShareCourse] = useState(null)
   const [showPassport, setShowPassport]     = useState(false)
   const [expandedRound, setExpandedRound]   = useState(null)
+  const [avatarUploading, setAvatarUploading] = useState(false)
   const [wantToPlay,    setWantToPlay]       = useState([])
   const [showFindFriends, setShowFindFriends] = useState(false)
   const [followListMode, setFollowListMode]   = useState(null) // 'followers' | 'following' | null
@@ -98,6 +107,33 @@ export default function Profile() {
     setFollowingCount(followingList?.length || 0)
   }
 
+  async function uploadAvatar(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Photo must be under 2MB')
+      return
+    }
+    setAvatarUploading(true)
+    const ext  = file.name.split('.').pop()
+    const path = `${user.id}/avatar.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true })
+    if (uploadError) {
+      alert('Upload failed: ' + uploadError.message)
+      setAvatarUploading(false)
+      return
+    }
+    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ avatar_url: publicUrl + '?t=' + Date.now() })
+      .eq('id', user.id)
+    if (!updateError) await fetchProfile(user.id)
+    setAvatarUploading(false)
+  }
+
   async function saveProfile(e) {
     e.preventDefault()
     setSaving(true)
@@ -131,7 +167,7 @@ export default function Profile() {
   const states    = [...new Set(rounds.map(r => r.courses?.state).filter(Boolean))]
   const bestRound = rounds.filter(r => r.score).sort((a, b) => a.score - b.score)[0]
 
-  const initials  = (profile?.full_name || profile?.username || user?.email || 'G').slice(0, 2).toUpperCase()
+  const initials  = getInitials(profile?.full_name || profile?.username || user?.email || '')
 
   const inputStyle = {
     width: '100%', padding: '11px 13px', borderRadius: 10,
@@ -163,8 +199,17 @@ export default function Profile() {
       {/* ── Profile Header ── */}
       <div style={{ background: B.navy, borderRadius: 20, padding: '26px 22px', marginBottom: 18 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 15, marginBottom: 20 }}>
-          <div style={{ width: 66, height: 66, borderRadius: '50%', background: B.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: serif, fontSize: 22, fontWeight: 900, color: B.navy, flexShrink: 0 }}>
-            {initials}
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <div style={{ width: 66, height: 66, borderRadius: '50%', background: B.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: serif, fontSize: 22, fontWeight: 900, color: B.navy, overflow: 'hidden' }}>
+              {profile?.avatar_url
+                ? <img src={profile.avatar_url} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                : initials}
+            </div>
+            {avatarUploading && (
+              <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: 16 }}>⏳</span>
+              </div>
+            )}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <h1 style={{ color: B.cream, margin: '0 0 3px', fontSize: 21, fontWeight: 900, fontFamily: serif, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -508,6 +553,21 @@ export default function Profile() {
           )}
 
           <form onSubmit={saveProfile}>
+            {/* Avatar upload */}
+            <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ width: 64, height: 64, borderRadius: '50%', background: B.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: serif, fontSize: 20, fontWeight: 900, color: B.navy, overflow: 'hidden', flexShrink: 0 }}>
+                {profile?.avatar_url
+                  ? <img src={profile.avatar_url} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                  : initials}
+              </div>
+              <div>
+                <label style={{ display: 'inline-block', background: B.feedBg, border: `1px solid ${B.border}`, borderRadius: 10, padding: '8px 14px', fontSize: 13, fontWeight: 600, color: B.textNavy, fontFamily: sans, cursor: avatarUploading ? 'not-allowed' : 'pointer' }}>
+                  {avatarUploading ? '⏳ Uploading...' : '📷 Change Photo'}
+                  <input type="file" accept="image/*" onChange={uploadAvatar} style={{ display: 'none' }} disabled={avatarUploading}/>
+                </label>
+                <div style={{ fontSize: 11, color: B.textSoft, fontFamily: sans, marginTop: 5 }}>Max 2MB · JPG, PNG, or GIF</div>
+              </div>
+            </div>
             <div style={{ marginBottom: 16 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: B.textMid, fontFamily: sans, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Full Name</label>
               <input value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your full name" style={inputStyle}/>

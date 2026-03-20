@@ -4,6 +4,14 @@ import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useTheme } from '../contexts/ThemeContext.jsx'
 
+function getInitials(name) {
+  if (!name) return 'G'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
+
+
 export default function FollowList({ userId, mode, onClose }) {
   // mode: 'followers' | 'following'
   const { B, serif, sans } = useTheme()
@@ -111,8 +119,8 @@ export default function FollowList({ userId, mode, onClose }) {
                 {mode === 'followers' ? 'Share your profile to get followers' : 'Find golfers to follow'}
               </div>
             </div>
-          ) : list.map(p => {
-            const initials = (p.full_name || p.username || 'G').slice(0, 2).toUpperCase()
+          ) : list.mapgetInitials(p => {
+            const initials = (p.full_name || p.username || 'G')
             const color = avatarColors[(p.username?.charCodeAt(0) || 0) % avatarColors.length]
             const isMe = user?.id === p.id
             const isFollowingThem = following.has(p.id)

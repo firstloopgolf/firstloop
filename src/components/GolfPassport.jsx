@@ -1,5 +1,13 @@
 import { useTheme } from '../contexts/ThemeContext.jsx'
 
+function getInitials(name) {
+  if (!name) return 'G'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
+
+
 function ratingEmoji(v) {
   if (!v) return null
   if (v <= 2)  return '😤'
@@ -14,7 +22,7 @@ export default function GolfPassport({ profile, rounds, onClose }) {
 
   const top5     = rounds.slice(0, 5)
   const states   = [...new Set(rounds.map(r => r.courses?.state).filter(Boolean))]
-  const initials = (profile?.full_name || profile?.username || 'G').slice(0, 2).toUpperCase()
+  const initials = getInitials(profile?.full_name || profile?.username || 'G')
   const name     = profile?.full_name || profile?.username || 'Golfer'
   const username = profile?.username || 'firstloop'
 

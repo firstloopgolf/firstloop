@@ -4,6 +4,14 @@ import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useTheme } from '../contexts/ThemeContext.jsx'
 
+function getInitials(name) {
+  if (!name) return 'G'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
+
+
 function Avatar({ initials, size = 40, color }) {
   const { B, sans } = useTheme()
   return (
@@ -22,7 +30,7 @@ function Avatar({ initials, size = 40, color }) {
 function GolferRow({ golfer, onFollow, onUnfollow, isFollowing, navigateTo }) {
   const { B, serif, sans } = useTheme()
   const [loading, setLoading] = useState(false)
-  const initials = (golfer.full_name || golfer.username || 'G').slice(0, 2).toUpperCase()
+  const initials = getInitials(golfer.full_name || golfer.username || 'G')
   const avatarColors = ['#2d5a27', '#1a3d5a', '#5a3a1a', '#3a1a5a', '#1a5a3a']
   const color = avatarColors[(golfer.username?.charCodeAt(0) || 0) % avatarColors.length]
 

@@ -4,6 +4,7 @@ import { useTheme } from '../contexts/ThemeContext.jsx'
 import { CourseCard } from '../components/UI.jsx'
 import { useTopCourses, useStateCourses, useCourseSearch } from '../hooks/useCourses.js'
 import CourseSuggestions from '../components/CourseSuggestions.jsx'
+import FoundingMemberBanner from '../components/FoundingMemberBanner.jsx'
 
 const STATES = [
   'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
@@ -143,6 +144,8 @@ export default function Discover() {
           </div>
         </div>
       </div>
+
+      <FoundingMemberBanner variant="compact" />
 
       {/* Filter toggle bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, overflowX: 'auto', paddingBottom: 2 }}>

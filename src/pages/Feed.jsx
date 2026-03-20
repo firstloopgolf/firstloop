@@ -7,6 +7,14 @@ import { Avatar, NatBadge, PageBanner } from '../components/UI.jsx'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
 import RoundComments from '../components/RoundComments.jsx'
 
+function getInitials(name) {
+  if (!name) return 'G'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
+
+
 // Convert stored rating (2–10) to emoji
 function ratingEmoji(v) {
   if (!v) return null
@@ -234,7 +242,7 @@ export default function Feed() {
           {rounds.map((round, i) => {
             const c = round.courses
             const p = round.profiles
-            const initials = (p?.full_name || p?.username || 'G').slice(0, 2).toUpperCase()
+            const initials = getInitials(p?.full_name || p?.username || 'G')
             const avatarColors = [B.navy, B.green, '#5a4a2a']
 
             return (

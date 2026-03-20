@@ -4,6 +4,14 @@ import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useTheme } from '../contexts/ThemeContext.jsx'
 
+function getInitials(name) {
+  if (!name) return 'G'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
+
+
 export default function RoundComments({ roundId, initialCount = 0 }) {
   const { B, serif, sans } = useTheme()
   const { user, profile } = useAuth()
@@ -115,7 +123,7 @@ useEffect(() => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 12 }}>
             {comments.map(c => {
               const name = c.profiles?.full_name || c.profiles?.username || 'Golfer'
-              const initials = name.slice(0, 2).toUpperCase()
+              const initials = getInitials(name)
               const isOwn = c.user_id === user?.id
               return (
                 <div key={c.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
@@ -153,7 +161,7 @@ useEffect(() => {
         )}
 
         {/* Comment input */}
-        {user ? (
+        {user ? getInitials(
           <form onSubmit={postComment} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             {/* Own avatar */}
             <div style={{
@@ -161,7 +169,7 @@ useEffect(() => {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: serif, fontSize: 10, fontWeight: 900, color: B.navy, flexShrink: 0,
             }}>
-              {(profile?.full_name || profile?.username || 'G').slice(0, 2).toUpperCase()}
+              {(profile?.full_name || profile?.username || 'G')}
             </div>
             <input
               ref={inputRef}

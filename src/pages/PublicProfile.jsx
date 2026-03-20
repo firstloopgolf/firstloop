@@ -6,6 +6,14 @@ import { useTheme } from '../contexts/ThemeContext.jsx'
 import { Pill } from '../components/UI.jsx'
 import FollowList from '../components/FollowList.jsx'
 
+function getInitials(name) {
+  if (!name) return 'G'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
+
+
 export default function PublicProfile() {
   const { B, serif, sans } = useTheme()
   const { userId } = useParams()
@@ -92,7 +100,7 @@ export default function PublicProfile() {
     </div>
   )
 
-  const initials = (profile.full_name || profile.username || 'G').slice(0, 2).toUpperCase()
+  const initials = getInitials(profile.full_name || profile.username || 'G')
   const isOwnProfile = user?.id === userId
   const states = [...new Set(rounds.map(r => r.courses?.state).filter(Boolean))]
 
