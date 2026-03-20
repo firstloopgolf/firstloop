@@ -142,7 +142,7 @@ export default function Admin() {
             ['⛳', stats.rounds.toLocaleString(),   'Rounds Logged'],
             ['📋', stats.pending.toLocaleString(),  'Pending Submissions'],
           ].map(([icon, num, label]) => (
-            <div key={label} style={{ background:'#fff', borderRadius:14, padding:'16px 12px', textAlign:'center', border:`1px solid ${B.border}` }}>
+            <div key={label} style={{ background:B.white, borderRadius:14, padding:'16px 12px', textAlign:'center', border:`1px solid ${B.border}` }}>
               <div style={{ fontSize:22, marginBottom:6 }}>{icon}</div>
               <div style={{ fontSize:22, fontWeight:900, color:B.navy, fontFamily:serif }}>{num}</div>
               <div style={{ fontSize:10, color:B.textSoft, fontFamily:sans, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', lineHeight:1.3 }}>{label}</div>
@@ -159,7 +159,7 @@ export default function Admin() {
       )}
 
       {/* Tabs */}
-      <div style={{ display:'flex', background:'#fff', borderRadius:12, padding:4, border:`1px solid ${B.border}`, marginBottom:18, gap:4 }}>
+      <div style={{ display:'flex', background:B.white, borderRadius:12, padding:4, border:`1px solid ${B.border}`, marginBottom:18, gap:4 }}>
         {[
           ['submissions', `📋 Pending (${pending.length})`],
           ['reviewed',    `✅ Reviewed (${reviewed.length})`],
@@ -175,7 +175,7 @@ export default function Admin() {
       {tab === 'submissions' && (
         <div>
           {pending.length === 0 ? (
-            <div style={{ textAlign:'center', padding:'40px 0', background:'#fff', borderRadius:16, border:`1px solid ${B.border}` }}>
+            <div style={{ textAlign:'center', padding:'40px 0', background:B.white, borderRadius:16, border:`1px solid ${B.border}` }}>
               <div style={{ fontSize:40, marginBottom:12 }}>🎉</div>
               <div style={{ fontSize:16, fontWeight:700, color:B.textNavy, fontFamily:serif, marginBottom:6 }}>All caught up!</div>
               <div style={{ fontSize:13, color:B.textSoft, fontFamily:sans }}>No pending course submissions</div>
@@ -183,7 +183,7 @@ export default function Admin() {
           ) : (
             <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
               {pending.map(sub => (
-                <div key={sub.id} style={{ background:'#fff', borderRadius:16, padding:'18px 20px', border:`1px solid ${B.border}` }}>
+                <div key={sub.id} style={{ background:B.white, borderRadius:16, padding:'18px 20px', border:`1px solid ${B.border}` }}>
                   <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:12 }}>
                     <div>
                       <div style={{ fontSize:16, fontWeight:800, color:B.textNavy, fontFamily:serif }}>{sub.name}</div>
@@ -221,7 +221,7 @@ export default function Admin() {
                       ✅ Approve & Add
                     </button>
                     <button onClick={() => rejectSubmission(sub)}
-                      style={{ background:'#fff', color:'#c00', border:'1px solid #fca5a5', borderRadius:10, padding:'10px 0', fontWeight:700, fontSize:13, cursor:'pointer', fontFamily:sans }}>
+                      style={{ background:B.white, color:'#c00', border:'1px solid #fca5a5', borderRadius:10, padding:'10px 0', fontWeight:700, fontSize:13, cursor:'pointer', fontFamily:sans }}>
                       ❌ Reject
                     </button>
                   </div>
@@ -236,11 +236,11 @@ export default function Admin() {
       {tab === 'reviewed' && (
         <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
           {reviewed.length === 0 ? (
-            <div style={{ textAlign:'center', padding:'40px 0', background:'#fff', borderRadius:16, border:`1px solid ${B.border}` }}>
+            <div style={{ textAlign:'center', padding:'40px 0', background:B.white, borderRadius:16, border:`1px solid ${B.border}` }}>
               <div style={{ fontSize:13, color:B.textSoft, fontFamily:sans }}>No reviewed submissions yet</div>
             </div>
           ) : reviewed.map(sub => (
-            <div key={sub.id} style={{ background:'#fff', borderRadius:14, padding:'14px 16px', border:`1px solid ${B.border}`, display:'flex', alignItems:'center', gap:12 }}>
+            <div key={sub.id} style={{ background:B.white, borderRadius:14, padding:'14px 16px', border:`1px solid ${B.border}`, display:'flex', alignItems:'center', gap:12 }}>
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{ fontSize:14, fontWeight:600, color:B.textNavy, fontFamily:sans, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{sub.name}</div>
                 <div style={{ fontSize:12, color:B.textSoft, fontFamily:sans }}>{sub.city}, {sub.state}</div>

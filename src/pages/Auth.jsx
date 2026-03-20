@@ -70,7 +70,7 @@ export default function Auth() {
             {mode === 'signup' && (
               <>
                 <input value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Full name" required style={inputStyle}/>
-                <input value={username} onChange={e => setUsername(e.target.value)} placeholder="Username (e.g. treyc)" required style={inputStyle}/>
+                <input value={username} onChange={e => setUsername(e.target.value)} placeholder="Username" required style={inputStyle}/>
               </>
             )}
             <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Email address" type="email" required style={inputStyle}/>
