@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useTheme } from '../contexts/ThemeContext.jsx'
 import { Pill } from '../components/UI.jsx'
+import FollowList from '../components/FollowList.jsx'
 
 export default function PublicProfile() {
   const { B, serif, sans } = useTheme()
@@ -15,7 +16,8 @@ export default function PublicProfile() {
   const [rounds,     setRounds]     = useState([])
   const [loading,    setLoading]    = useState(true)
   const [isFollowing, setIsFollowing] = useState(false)
-  const [followLoading, setFollowLoading] = useState(false)
+  const [followLoading, setFollowLoading]   = useState(false)
+  const [followListMode, setFollowListMode] = useState(null)
   const [followerCount, setFollowerCount] = useState(0)
   const [followingCount, setFollowingCount] = useState(0)
 
@@ -128,11 +130,11 @@ export default function PublicProfile() {
             <div style={{ color: B.gold, fontSize: 18, fontWeight: 900, fontFamily: serif }}>{rounds.length}</div>
             <div style={{ color: 'rgba(240,232,213,0.5)', fontSize: 10, fontWeight: 600, fontFamily: sans }}>Courses</div>
           </div>
-          <div style={{ textAlign: 'center' }}>
+          <div onClick={() => setFollowListMode('followers')} style={{ textAlign: 'center', cursor: 'pointer' }}>
             <div style={{ color: B.gold, fontSize: 18, fontWeight: 900, fontFamily: serif }}>{followerCount}</div>
             <div style={{ color: 'rgba(240,232,213,0.5)', fontSize: 10, fontWeight: 600, fontFamily: sans }}>Followers</div>
           </div>
-          <div style={{ textAlign: 'center' }}>
+          <div onClick={() => setFollowListMode('following')} style={{ textAlign: 'center', cursor: 'pointer' }}>
             <div style={{ color: B.gold, fontSize: 18, fontWeight: 900, fontFamily: serif }}>{followingCount}</div>
             <div style={{ color: 'rgba(240,232,213,0.5)', fontSize: 10, fontWeight: 600, fontFamily: sans }}>Following</div>
           </div>
@@ -205,6 +207,7 @@ export default function PublicProfile() {
           </div>
         </div>
       )}
+      {followListMode && <FollowList userId={userId} mode={followListMode} onClose={() => setFollowListMode(null)}/>}
     </div>
   )
 }

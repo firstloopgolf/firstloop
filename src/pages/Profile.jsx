@@ -9,6 +9,7 @@ import ShareRoundModal from '../components/ShareRoundModal.jsx'
 import GolfPassport from '../components/GolfPassport.jsx'
 import CourseSuggestions from '../components/CourseSuggestions.jsx'
 import FindFriends from '../components/FindFriends.jsx'
+import FollowList from '../components/FollowList.jsx'
 
 export default function Profile() {
   const { B, serif, sans } = useTheme()
@@ -23,6 +24,7 @@ export default function Profile() {
   const [shareCourse, setShareCourse] = useState(null)
   const [showPassport, setShowPassport]     = useState(false)
   const [showFindFriends, setShowFindFriends] = useState(false)
+  const [followListMode, setFollowListMode]   = useState(null) // 'followers' | 'following' | null
   const [followerCount, setFollowerCount]     = useState(0)
   const [followingCount, setFollowingCount]   = useState(0)
 
@@ -131,6 +133,7 @@ export default function Profile() {
         />
       )}
       {showFindFriends && <FindFriends onClose={() => setShowFindFriends(false)}/>}
+      {followListMode && <FollowList userId={user?.id} mode={followListMode} onClose={() => setFollowListMode(null)}/>}
       {showPassport && (
         <GolfPassport
           profile={profile}
@@ -165,12 +168,14 @@ export default function Profile() {
         {/* Stats grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
           {[
-            [rounds.length,   'Courses'],
-            [followerCount,   'Followers'],
-            [followingCount,  'Following'],
-            [states.length,   'States'],
-          ].map(([n, l]) => (
-            <div key={l} style={{ background: 'rgba(240,232,213,0.08)', borderRadius: 11, padding: '11px 8px', textAlign: 'center' }}>
+            [rounds.length,   'Courses',   null],
+            [followerCount,   'Followers', 'followers'],
+            [followingCount,  'Following', 'following'],
+            [states.length,   'States',    null],
+          ].map(([n, l, mode]) => (
+            <div key={l}
+              onClick={() => mode && setFollowListMode(mode)}
+              style={{ background: 'rgba(240,232,213,0.08)', borderRadius: 11, padding: '11px 8px', textAlign: 'center', cursor: mode ? 'pointer' : 'default' }}>
               <div style={{ color: B.gold, fontSize: 18, fontWeight: 900, fontFamily: serif }}>{n}</div>
               <div style={{ color: 'rgba(240,232,213,0.5)', fontSize: 10, fontWeight: 600, fontFamily: sans }}>{l}</div>
             </div>
