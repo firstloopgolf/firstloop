@@ -57,7 +57,7 @@ export default function CourseDetail() {
 
   async function checkWantToPlay() {
     const { data } = await supabase.from('want_to_play')
-      .select('id').eq('user_id', user.id).eq('course_id', id).maybeSingle()
+      .select('id').eq('user_id', user.id).eq('course_id', parseInt(id)).maybeSingle()
     setWantToPlay(!!data)
   }
 
@@ -66,7 +66,7 @@ export default function CourseDetail() {
     setWantLoading(true)
     if (wantToPlay) {
       await supabase.from('want_to_play').delete()
-        .eq('user_id', user.id).eq('course_id', id)
+        .eq('user_id', user.id).eq('course_id', parseInt(id))
       setWantToPlay(false)
     } else {
       await supabase.from('want_to_play').insert({ user_id: user.id, course_id: parseInt(id) })
