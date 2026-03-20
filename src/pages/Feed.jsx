@@ -71,7 +71,7 @@ function AxisPills({ conditions, value, vibes }) {
 export default function Feed() {
   const { B, serif, sans } = useTheme()
   const navigate          = useNavigate()
-  const { user }          = useAuth()
+  const { user, profile } = useAuth()
   const [rounds,     setRounds]     = useState([])
   const [loading,    setLoading]    = useState(true)
   const [liked,      setLiked]      = useState({})
@@ -80,23 +80,21 @@ export default function Feed() {
   const [showLikers,  setShowLikers]  = useState({})
   const [shareRound, setShareRound] = useState(null)  // ← was missing, caused bug
   const [shareCourse,setShareCourse]= useState(null)
+  const [feedTab, setFeedTab] = useState('community') // 'community' | 'following'
 
-  useEffect(() => { fetchFeed() }, [user])
+  useEffect(() => { fetchFeed(feedTab) }, [user, feedTab])
 
-  async function fetchFeed() {
+  async function fetchFeed(tab) {
     setLoading(true)
+    const activeTab = tab || feedTab
 
-    // If logged in, try to show followed users' rounds first
-    if (user) {
+    if (user && activeTab === 'following') {
       const { data: follows } = await supabase
         .from('follows')
         .select('following_id')
         .eq('follower_id', user.id)
-
       const followingIds = (follows || []).map(f => f.following_id)
-
       if (followingIds.length > 0) {
-        // Show followed users + own rounds
         const ids = [...followingIds, user.id]
         const { data } = await supabase
           .from('rounds')
@@ -105,12 +103,14 @@ export default function Feed() {
           .order('created_at', { ascending: false })
           .limit(40)
         setRounds(data || [])
-        setLoading(false)
-        return
+      } else {
+        setRounds([])
       }
+      setLoading(false)
+      return
     }
 
-    // Fallback: show all public rounds
+    // Community — all public rounds
     const { data } = await supabase
       .from('rounds')
       .select('*, profiles(username, full_name, avatar_url), courses(id, name, state, nat_rank, icon, bg_color)')
@@ -183,6 +183,16 @@ export default function Feed() {
 
       <PageBanner icon="📋" title="Community Feed" subtitle="Latest rounds from golfers in the network" bg={B.green}/>
 
+      {/* Feed tabs */}
+      <div style={{ display: 'flex', background: B.white, borderRadius: 12, padding: 4, border: `1px solid ${B.border}`, marginBottom: 16, gap: 4 }}>
+        {[['community', '🌍 Community'], ['following', '👥 Following']].map(([id, label]) => (
+          <button key={id} onClick={() => setFeedTab(id)}
+            style={{ flex: 1, padding: '9px 0', borderRadius: 9, border: 'none', background: feedTab === id ? B.navy : 'transparent', color: feedTab === id ? B.cream : B.textMid, fontWeight: 600, cursor: 'pointer', fontSize: 13, fontFamily: sans, transition: 'all 0.15s' }}>
+            {label}
+          </button>
+        ))}
+      </div>
+
       <button
         onClick={() => user ? navigate('/log') : navigate('/auth')}
         style={{ width: '100%', background: B.gold, color: B.navy, border: 'none', borderRadius: 12, padding: '13px 0', fontWeight: 800, fontSize: 15, cursor: 'pointer', marginBottom: 16, fontFamily: serif }}
@@ -196,11 +206,15 @@ export default function Feed() {
             <div key={i} style={{ background: B.white, borderRadius: 16, height: 240, border: `1px solid ${B.border}`, opacity: 0.5 }}/>
           ))}
         </div>
-      ) : rounds.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 0', background: B.white, borderRadius: 16, border: `1px solid ${B.border}` }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>⛳</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: B.textNavy, fontFamily: serif, marginBottom: 8 }}>No rounds yet</div>
-          <div style={{ fontSize: 13, color: B.textSoft, fontFamily: sans, marginBottom: 20 }}>Be the first to log a round</div>
+            ) : rounds.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '60px 20px', background: B.white, borderRadius: 16, border: `1px solid ${B.border}` }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>{feedTab === 'following' ? '👥' : '⛳'}</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: B.textNavy, fontFamily: serif, marginBottom: 8 }}>
+            {feedTab === 'following' ? 'No rounds from people you follow' : 'No rounds yet'}
+          </div>
+          <div style={{ fontSize: 13, color: B.textSoft, fontFamily: sans, marginBottom: 20 }}>
+            {feedTab === 'following' ? 'Follow other golfers to see their rounds here' : 'Be the first to log a round'}
+          </div>
           <button onClick={() => navigate('/log')}
             style={{ background: B.gold, color: B.navy, border: 'none', borderRadius: 12, padding: '11px 24px', fontWeight: 700, cursor: 'pointer', fontFamily: serif }}>
             Log a Round

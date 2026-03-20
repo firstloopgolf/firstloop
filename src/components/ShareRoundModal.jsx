@@ -254,7 +254,7 @@ export default function ShareRoundModal({ round, course, onClose }) {
     <div onClick={e => e.target === e.currentTarget && onClose()}
       style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', zIndex:500,
         display:'flex', alignItems:'flex-end', justifyContent:'center' }}>
-      <div style={{ background:'#fff', borderRadius:'20px 20px 0 0', width:'100%',
+      <div style={{ background:B.white, borderRadius:'20px 20px 0 0', width:'100%',
         maxWidth:540, maxHeight:'92vh', overflowY:'auto', padding:'28px 24px 44px' }}>
 
         {/* Header */}
