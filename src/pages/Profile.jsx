@@ -23,6 +23,8 @@ export default function Profile() {
   const [shareRound, setShareRound] = useState(null)
   const [shareCourse, setShareCourse] = useState(null)
   const [showPassport, setShowPassport]     = useState(false)
+  const [expandedRound, setExpandedRound]   = useState(null)
+  const [wantToPlay,    setWantToPlay]       = useState([])
   const [showFindFriends, setShowFindFriends] = useState(false)
   const [followListMode, setFollowListMode]   = useState(null) // 'followers' | 'following' | null
   const [followerCount, setFollowerCount]     = useState(0)
@@ -38,7 +40,7 @@ export default function Profile() {
 
   const STATES = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']
 
-  useEffect(() => { fetchRounds(); fetchFollowCounts() }, [user])
+  useEffect(() => { fetchRounds(); fetchFollowCounts(); fetchWantToPlay() }, [user])
 
   // Re-fetch counts when user navigates back to this page
   useEffect(() => {
@@ -63,11 +65,27 @@ export default function Profile() {
     setLoading(true)
     const { data } = await supabase
       .from('rounds')
-      .select('*, courses(*)')
+      .select('*, courses(id, name, state, location, icon, bg_color)')
       .eq('user_id', user.id)
       .order('elo_score', { ascending: false })   // ← ORDER BY ELO (best first)
     setRounds(data || [])
     setLoading(false)
+  }
+
+  async function fetchWantToPlay() {
+    if (!user) return
+    const { data } = await supabase
+      .from('want_to_play')
+      .select('*, courses(id, name, state, location, icon, bg_color)')
+      .eq('user_id', user.id)
+      .order('added_at', { ascending: false })
+    setWantToPlay(data || [])
+  }
+
+  async function removeWantToPlay(courseId) {
+    await supabase.from('want_to_play').delete()
+      .eq('user_id', user.id).eq('course_id', courseId)
+    setWantToPlay(prev => prev.filter(w => w.course_id !== courseId))
   }
 
   async function fetchFollowCounts() {
@@ -121,7 +139,7 @@ export default function Profile() {
     color: B.textNavy, outline: 'none', background: B.white, boxSizing: 'border-box',
   }
 
-  const tabs = [['rounds', 'My Rounds'], ['stats', 'Stats'], ['edit', 'Edit Profile']]
+  const tabs = [['rounds', 'My Rounds'], ['want', 'Want to Play'], ['stats', 'Stats'], ['edit', 'Edit Profile']]
 
   return (
     <div>
@@ -152,9 +170,17 @@ export default function Profile() {
             <h1 style={{ color: B.cream, margin: '0 0 3px', fontSize: 21, fontWeight: 900, fontFamily: serif, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {profile?.full_name || profile?.username || 'Golfer'}
             </h1>
-            <div style={{ color: B.cream, opacity: 0.6, fontSize: 12, fontFamily: sans, marginBottom: 8 }}>
+            <div style={{ color: B.cream, opacity: 0.6, fontSize: 12, fontFamily: sans, marginBottom: 6 }}>
               @{profile?.username || 'firstloop'} · Member since {new Date(user?.created_at).getFullYear()}
             </div>
+            {profile?.is_founding_member && (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(201,168,76,0.18)', border: '1px solid rgba(201,168,76,0.4)', borderRadius: 999, padding: '3px 10px', marginBottom: 8 }}>
+                <span style={{ fontSize: 12 }}>⭐</span>
+                <span style={{ fontFamily: sans, fontSize: 11, fontWeight: 800, color: B.gold, letterSpacing: '0.04em' }}>
+                  Founding Member {profile.member_number ? `#${profile.member_number}` : ''}
+                </span>
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
               {profile?.handicap != null && <Pill gold>⛳ Hdcp: {profile.handicap}</Pill>}
               {profile?.location  && <Pill gold>📍 {profile.location}</Pill>}
@@ -273,57 +299,74 @@ export default function Profile() {
                                 : rank === 3 ? '#A97240'
                                 : B.textNavy
 
+                const isExpanded = expandedRound === r.id
                 return (
-                  <div
-                    key={r.id}
-                    onClick={() => navigate(`/course/${r.course_id}`)}
-                    style={{ background: B.white, borderRadius: 13, padding: '13px 15px', cursor: 'pointer', border: `1px solid ${B.border}`, display: 'flex', alignItems: 'center', gap: 11, transition: 'all 0.15s' }}
-                    onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(27,48,84,0.08)'; e.currentTarget.style.borderColor = B.gold }}
-                    onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = B.border }}
-                  >
-                    {/* Rank number — the hero element */}
-                    <div style={{
-                      width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: rank <= 3 ? `${rankColor}18` : B.feedBg,
-                      border: `1.5px solid ${rank <= 3 ? rankColor : B.border}`,
-                    }}>
-                      <span style={{ fontSize: 14, fontWeight: 900, color: rankColor, fontFamily: serif }}>
-                        #{rank}
-                      </span>
-                    </div>
-
-                    {/* Course icon */}
-                    <div style={{ width: 42, height: 42, borderRadius: 10, background: bgColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19, flexShrink: 0 }}>
-                      {icon}
-                    </div>
-
-                    {/* Course name + date */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: B.textNavy, fontFamily: sans, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {r.courses?.name || 'Course'}
+                  <div key={r.id} style={{ background: B.white, borderRadius: 13, border: `1px solid ${isExpanded ? B.gold : B.border}`, overflow: 'hidden', transition: 'all 0.15s' }}>
+                    {/* Main row — tap to expand */}
+                    <div
+                      onClick={() => setExpandedRound(isExpanded ? null : r.id)}
+                      style={{ padding: '13px 15px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 11 }}
+                    >
+                      {/* Rank badge */}
+                      <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: rank <= 3 ? `${rankColor}18` : B.feedBg, border: `1.5px solid ${rank <= 3 ? rankColor : B.border}` }}>
+                        <span style={{ fontSize: 14, fontWeight: 900, color: rankColor, fontFamily: serif }}>#{rank}</span>
                       </div>
-                      <div style={{ fontSize: 12, color: B.textSoft, fontFamily: sans }}>
-                        {r.played_at ? new Date(r.played_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                      {/* Course icon */}
+                      <div style={{ width: 42, height: 42, borderRadius: 10, background: bgColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19, flexShrink: 0 }}>{icon}</div>
+                      {/* Course info */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: B.textNavy, fontFamily: sans, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {r.courses?.name || 'Course'}
+                        </div>
+                        <div style={{ fontSize: 11, color: B.textSoft, fontFamily: sans }}>
+                          {r.courses?.location || r.courses?.state || ''}
+                          {r.played_at ? ` · ${new Date(r.played_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}
+                        </div>
+                      </div>
+                      {/* Score + expand indicator */}
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        {r.score && <div style={{ fontSize: 15, fontWeight: 800, color: B.textNavy, fontFamily: serif }}>{r.score}</div>}
+                        <div style={{ fontSize: 10, color: B.textSoft, fontFamily: sans, marginTop: 2 }}>{isExpanded ? '▲' : '▼'}</div>
                       </div>
                     </div>
 
-                    {/* Score (if logged) */}
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      {r.score && (
-                        <div style={{ fontSize: 15, fontWeight: 800, color: B.textNavy, fontFamily: serif }}>{r.score}</div>
-                      )}
-                    </div>
-
-                    {/* Share button */}
-                    <button
-                      onClick={e => {
-                        e.stopPropagation()
-                        setShareRound(r)
-                        setShareCourse({ id: r.course_id, name: r.courses?.name, location: r.courses?.location, bg: c?.bg || B.navy, icon: c?.icon || '⛳' })
-                      }}
-                      style={{ background: 'none', border: `1px solid ${B.border}`, borderRadius: 999, padding: '4px 10px', cursor: 'pointer', fontSize: 11, color: B.textMid, fontFamily: sans, fontWeight: 600, flexShrink: 0 }}
-                    >📤</button>
+                    {/* Expanded section */}
+                    {isExpanded && (
+                      <div style={{ borderTop: `1px solid ${B.border}`, padding: '14px 15px', background: B.feedBg }}>
+                        {/* Photo */}
+                        {r.photo_url && (
+                          <div style={{ borderRadius: 10, overflow: 'hidden', marginBottom: 12 }}>
+                            <img src={r.photo_url} alt="Round photo" style={{ width: '100%', maxHeight: 200, objectFit: 'cover', display: 'block' }}/>
+                          </div>
+                        )}
+                        {/* Note */}
+                        {r.comment && (
+                          <p style={{ margin: '0 0 12px', fontSize: 13, color: B.textNavy, fontFamily: sans, fontStyle: 'italic', lineHeight: 1.6 }}>"{r.comment}"</p>
+                        )}
+                        {/* 3-axis ratings */}
+                        {(r.conditions_rating || r.value_rating || r.vibes_rating) && (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginBottom: 12 }}>
+                            {[['Conditions', r.conditions_rating, B.greenLight], ['Value', r.value_rating, B.gold], ['Facilities', r.vibes_rating, '#a07840']].map(([label, val, color]) => val ? (
+                              <div key={label} style={{ background: B.white, borderRadius: 8, padding: '8px 6px', textAlign: 'center', border: `1px solid ${B.border}` }}>
+                                <div style={{ fontSize: 15, fontWeight: 900, color, fontFamily: serif }}>{val}</div>
+                                <div style={{ fontSize: 9, color: B.textSoft, fontFamily: sans, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>{label}</div>
+                              </div>
+                            ) : null)}
+                          </div>
+                        )}
+                        {/* Actions */}
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button onClick={() => navigate(`/course/${r.course_id}`)}
+                            style={{ flex: 1, background: B.navy, color: B.cream, border: 'none', borderRadius: 9, padding: '9px 0', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: sans }}>
+                            View Course →
+                          </button>
+                          <button onClick={e => { e.stopPropagation(); setShareRound(r); setShareCourse({ id: r.course_id, name: r.courses?.name, location: r.courses?.location, bg: c?.bg || B.navy, icon: c?.icon || '⛳' }) }}
+                            style={{ background: 'none', border: `1px solid ${B.border}`, borderRadius: 9, padding: '9px 14px', cursor: 'pointer', fontSize: 12, color: B.textMid, fontFamily: sans, fontWeight: 600 }}>
+                            📤 Share
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -331,6 +374,41 @@ export default function Profile() {
           )}
 
           <CourseSuggestions />
+        </div>
+      )}
+
+      {/* ── WANT TO PLAY ── */}
+      {tab === 'want' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+          {wantToPlay.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', background: B.white, borderRadius: 16, border: `1px solid ${B.border}` }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: B.textNavy, fontFamily: serif, marginBottom: 6 }}>No courses saved yet</div>
+              <div style={{ fontSize: 13, color: B.textSoft, fontFamily: sans, marginBottom: 16 }}>Browse courses and tap "Want to Play" to build your bucket list</div>
+              <button onClick={() => navigate('/discover')}
+                style={{ background: B.gold, color: B.navy, border: 'none', borderRadius: 12, padding: '10px 24px', fontWeight: 700, cursor: 'pointer', fontFamily: serif, fontSize: 13 }}>
+                Browse Courses
+              </button>
+            </div>
+          ) : wantToPlay.map(w => (
+            <div key={w.id} style={{ background: B.white, borderRadius: 13, padding: '13px 15px', border: `1px solid ${B.border}`, display: 'flex', alignItems: 'center', gap: 11 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 10, background: w.courses?.bg_color || B.navy, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19, flexShrink: 0 }}>
+                {w.courses?.icon || '⛳'}
+              </div>
+              <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => navigate(`/course/${w.course_id}`)}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: B.textNavy, fontFamily: sans, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {w.courses?.name || 'Course'}
+                </div>
+                <div style={{ fontSize: 11, color: B.textSoft, fontFamily: sans }}>
+                  {w.courses?.location || w.courses?.state || ''}
+                </div>
+              </div>
+              <button onClick={() => removeWantToPlay(w.course_id)}
+                style={{ background: 'none', border: `1px solid ${B.border}`, borderRadius: 999, padding: '5px 10px', cursor: 'pointer', fontSize: 11, color: B.textMid, fontFamily: sans, fontWeight: 600, flexShrink: 0 }}>
+                ✕ Remove
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
@@ -381,12 +459,26 @@ export default function Profile() {
 
           {/* Stats grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            {[
-              ['Rounds Logged', rounds.length,   '& counting'],
-              ['Avg Score',     avgScore,         'per round'],
-              ['States Played', states.length,    states.slice(0, 3).join(' · ') || 'none yet'],
-              ['Best Score',    bestRound?.score || '--', bestRound?.courses?.name || ''],
-            ].map(([label, val, sub]) => (
+            {(() => {
+              const withConditions = rounds.filter(r => r.conditions_rating)
+              const withValue      = rounds.filter(r => r.value_rating)
+              const withVibes      = rounds.filter(r => r.vibes_rating)
+              const avgConditions  = withConditions.length ? (withConditions.reduce((s,r) => s + r.conditions_rating, 0) / withConditions.length).toFixed(1) : '--'
+              const avgValue       = withValue.length      ? (withValue.reduce((s,r) => s + r.value_rating, 0)      / withValue.length).toFixed(1)      : '--'
+              const avgVibes       = withVibes.length      ? (withVibes.reduce((s,r) => s + r.vibes_rating, 0)      / withVibes.length).toFixed(1)      : '--'
+              const stateCounts    = rounds.reduce((acc, r) => { const s = r.courses?.state; if (s) acc[s] = (acc[s]||0)+1; return acc }, {})
+              const mostPlayedState = Object.entries(stateCounts).sort((a,b) => b[1]-a[1])[0]?.[0] || '--'
+              return [
+                ['Rounds Logged',   rounds.length,        '& counting'],
+                ['Avg Score',       avgScore,              'per round'],
+                ['States Played',   states.length,         states.slice(0,3).join(' · ') || 'none yet'],
+                ['Best Score',      bestRound?.score||'--', bestRound?.courses?.name||''],
+                ['Avg Conditions',  avgConditions,         'out of 10'],
+                ['Avg Value',       avgValue,              'out of 10'],
+                ['Avg Facilities',  avgVibes,              'out of 10'],
+                ['Most Played',     mostPlayedState,       'home state'],
+              ]
+            })().map(([label, val, sub]) => (
               <div key={label} style={{ background: B.white, borderRadius: 13, padding: '15px 13px', border: `1px solid ${B.border}`, textAlign: 'center' }}>
                 <div style={{ fontSize: 11, color: B.textSoft, fontFamily: sans, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>{label}</div>
                 <div style={{ fontSize: 17, fontWeight: 800, color: B.textNavy, fontFamily: serif, marginBottom: 3 }}>{val}</div>

@@ -23,8 +23,11 @@ export default function CourseDetail() {
   const [players, setPlayers]               = useState([])
   const [showFindFriends, setShowFindFriends] = useState(false)
   const [followTarget, setFollowTarget]       = useState(null)
+  const [wantToPlay,    setWantToPlay]         = useState(false)
+  const [wantLoading,   setWantLoading]         = useState(false)
 
   useEffect(() => { if (id) { fetchRounds(); fetchPlayers() } }, [id])
+  useEffect(() => { if (id && user) checkWantToPlay() }, [id, user])
 
     // Update page title and meta for SEO
     useEffect(() => {
@@ -50,6 +53,26 @@ export default function CourseDetail() {
       .limit(20)
     setRounds(data || [])
     setLoadingRounds(false)
+  }
+
+  async function checkWantToPlay() {
+    const { data } = await supabase.from('want_to_play')
+      .select('id').eq('user_id', user.id).eq('course_id', id).maybeSingle()
+    setWantToPlay(!!data)
+  }
+
+  async function toggleWantToPlay() {
+    if (!user) { navigate('/auth'); return }
+    setWantLoading(true)
+    if (wantToPlay) {
+      await supabase.from('want_to_play').delete()
+        .eq('user_id', user.id).eq('course_id', id)
+      setWantToPlay(false)
+    } else {
+      await supabase.from('want_to_play').insert({ user_id: user.id, course_id: parseInt(id) })
+      setWantToPlay(true)
+    }
+    setWantLoading(false)
   }
 
   async function fetchPlayers() {
@@ -117,10 +140,19 @@ export default function CourseDetail() {
 
       {tab==='feed' && (
         <div>
-          <button onClick={() => user ? navigate('/log', { state: { courseId: course.id, courseName: course.name, courseIcon: course.icon, courseBg: course.bg, courseState: course.state } }) : navigate('/auth')}
-            style={{ width:'100%', background:B.gold, color:B.navy, border:'none', borderRadius:12, padding:'14px 0', fontWeight:800, fontSize:15, cursor:'pointer', marginBottom:14, fontFamily:serif }}>
-            + Log Your Round Here
-          </button>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr auto', gap:8, marginBottom:14 }}>
+            <button onClick={() => user ? navigate('/log', { state: { courseId: course.id, courseName: course.name, courseIcon: course.icon, courseBg: course.bg, courseState: course.state } }) : navigate('/auth')}
+              style={{ background:B.gold, color:B.navy, border:'none', borderRadius:12, padding:'14px 0', fontWeight:800, fontSize:15, cursor:'pointer', fontFamily:serif }}>
+              + Log Your Round Here
+            </button>
+            <button
+              onClick={toggleWantToPlay}
+              disabled={wantLoading}
+              title={wantToPlay ? 'Remove from Want to Play' : 'Add to Want to Play'}
+              style={{ background: wantToPlay ? B.gold : B.white, color: wantToPlay ? B.navy : B.textMid, border: `1.5px solid ${wantToPlay ? B.gold : B.border}`, borderRadius:12, padding:'14px 16px', fontWeight:700, fontSize:16, cursor: wantLoading ? 'not-allowed' : 'pointer', transition:'all 0.15s', opacity: wantLoading ? 0.6 : 1, whiteSpace:'nowrap' }}>
+              {wantToPlay ? '★ Saved' : '☆ Want to Play'}
+            </button>
+          </div>
           {loadingRounds ? (
             <div style={{ textAlign:'center', padding:'40px 0', color:B.textSoft, fontFamily:sans }}>Loading reviews...</div>
           ) : rounds.length === 0 ? (
