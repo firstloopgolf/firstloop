@@ -11,7 +11,8 @@ export default function Admin() {
   const { user, isAdmin } = useAuth()
 
   const [tab, setTab]               = useState('submissions')
-  const [submissions, setSubmissions] = useState([])
+  const [submissions, setSubmissions]     = useState([])
+  const [updateRequests, setUpdateRequests] = useState([])
   const [stats, setStats]           = useState(null)
   const [loading, setLoading]       = useState(true)
   const [actionMsg, setActionMsg]   = useState('')
@@ -24,7 +25,7 @@ export default function Admin() {
 
   async function fetchAll() {
     setLoading(true)
-    await Promise.all([fetchSubmissions(), fetchStats()])
+    await Promise.all([fetchSubmissions(), fetchStats(), fetchUpdateRequests()])
     setLoading(false)
   }
 
@@ -36,18 +37,57 @@ export default function Admin() {
     setSubmissions(data || [])
   }
 
+  async function fetchUpdateRequests() {
+    const { data } = await supabase
+      .from('course_update_requests')
+      .select('*, courses(name, icon, location, state), profiles(username, full_name)')
+      .order('created_at', { ascending: false })
+    setUpdateRequests(data || [])
+  }
+
+  async function applyUpdate(req) {
+    setActionMsg('')
+    const updates = {}
+    if (req.icon)        updates.icon        = req.icon
+    if (req.description) updates.description = req.description
+    if (req.par)         updates.par         = req.par
+    if (req.holes)       updates.holes       = req.holes
+    if (req.price)       updates.price       = req.price
+    if (req.website)     updates.website     = req.website
+
+    if (Object.keys(updates).length === 0) {
+      setActionMsg('⚠️ No fields to apply')
+      return
+    }
+
+    const { error } = await supabase.from('courses').update(updates).eq('id', req.course_id)
+    if (error) { setActionMsg('❌ Error: ' + error.message); return }
+
+    await supabase.from('course_update_requests').update({ status: 'approved' }).eq('id', req.id)
+    setActionMsg(`✅ Update applied to "${req.courses?.name}"`)
+    fetchUpdateRequests()
+  }
+
+  async function rejectUpdate(req) {
+    await supabase.from('course_update_requests').update({ status: 'rejected' }).eq('id', req.id)
+    setActionMsg(`🗑️ Update request rejected`)
+    fetchUpdateRequests()
+  }
+
   async function fetchStats() {
-    const [courses, rounds, profiles, pending] = await Promise.all([
+    const [courses, rounds, profiles, pending, pendingUpdates] = await Promise.all([
       supabase.from('courses').select('id', { count:'exact', head:true }),
       supabase.from('rounds').select('id', { count:'exact', head:true }),
       supabase.from('profiles').select('id', { count:'exact', head:true }),
       supabase.from('course_submissions').select('id', { count:'exact', head:true }).eq('status','pending'),
+      supabase.from('course_update_requests').select('id', { count:'exact', head:true }).eq('status','pending'),
     ])
     setStats({
       courses:  courses.count  || 0,
       rounds:   rounds.count   || 0,
       users:    profiles.count || 0,
       pending:  pending.count  || 0,
+      pendingUpdates: pendingUpdates.count || 0,
     })
   }
 
@@ -135,12 +175,13 @@ export default function Admin() {
 
       {/* Stats */}
       {stats && (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10, marginBottom:20 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:10, marginBottom:20 }}>
           {[
             ['🏌️', stats.courses.toLocaleString(),  'Total Courses'],
             ['👤', stats.users.toLocaleString(),    'Users'],
             ['⛳', stats.rounds.toLocaleString(),   'Rounds Logged'],
             ['📋', stats.pending.toLocaleString(),  'Pending Submissions'],
+            ['✏️', stats.pendingUpdates.toLocaleString(), 'Pending Updates'],
           ].map(([icon, num, label]) => (
             <div key={label} style={{ background:B.white, borderRadius:14, padding:'16px 12px', textAlign:'center', border:`1px solid ${B.border}` }}>
               <div style={{ fontSize:22, marginBottom:6 }}>{icon}</div>
@@ -163,6 +204,7 @@ export default function Admin() {
         {[
           ['submissions', `📋 Pending (${pending.length})`],
           ['reviewed',    `✅ Reviewed (${reviewed.length})`],
+          ['updates',     `✏️ Updates (${updateRequests.filter(r => r.status === 'pending').length})`],
         ].map(([v,l]) => (
           <button key={v} onClick={() => setTab(v)}
             style={{ flex:1, padding:'9px 0', borderRadius:9, border:'none', background:tab===v ? B.navy:'transparent', color:tab===v ? B.cream:B.textMid, fontWeight:600, cursor:'pointer', fontSize:13, fontFamily:sans, transition:'all 0.15s' }}>
@@ -256,6 +298,54 @@ export default function Admin() {
           ))}
         </div>
       )}
+
+      {/* Update requests tab */}
+      {tab === 'updates' && (
+        <div>
+          {updateRequests.filter(r => r.status === 'pending').length === 0 ? (
+            <div style={{ textAlign:'center', padding:'40px 0', background:B.white, borderRadius:16, border:`1px solid ${B.border}` }}>
+              <div style={{ fontSize:40, marginBottom:12 }}>🎉</div>
+              <div style={{ fontSize:16, fontWeight:700, color:B.textNavy, fontFamily:serif, marginBottom:6 }}>All caught up!</div>
+              <div style={{ fontSize:13, color:B.textSoft, fontFamily:sans }}>No pending update requests</div>
+            </div>
+          ) : (
+            <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+              {updateRequests.filter(r => r.status === 'pending').map(req => (
+                <div key={req.id} style={{ background:B.white, borderRadius:16, padding:'18px 20px', border:`1px solid ${B.border}` }}>
+                  <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:12 }}>
+                    <div>
+                      <div style={{ fontSize:16, fontWeight:800, color:B.textNavy, fontFamily:serif }}>{req.courses?.name}</div>
+                      <div style={{ fontSize:12, color:B.textMid, fontFamily:sans, marginTop:2 }}>
+                        by @{req.profiles?.username || 'user'} · {new Date(req.created_at).toLocaleDateString('en-US', { month:'short', day:'numeric' })}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:14 }}>
+                    {req.icon        && <div style={{ fontSize:13, fontFamily:sans, color:B.textNavy }}><strong>Icon:</strong> {req.icon}</div>}
+                    {req.description && <div style={{ fontSize:13, fontFamily:sans, color:B.textNavy }}><strong>Description:</strong> {req.description}</div>}
+                    {req.par         && <div style={{ fontSize:13, fontFamily:sans, color:B.textNavy }}><strong>Par:</strong> {req.par}</div>}
+                    {req.holes       && <div style={{ fontSize:13, fontFamily:sans, color:B.textNavy }}><strong>Holes:</strong> {req.holes}</div>}
+                    {req.price       && <div style={{ fontSize:13, fontFamily:sans, color:B.textNavy }}><strong>Price:</strong> {req.price}</div>}
+                    {req.website     && <div style={{ fontSize:13, fontFamily:sans, color:B.textNavy }}><strong>Website:</strong> <a href={req.website} target="_blank" rel="noopener noreferrer" style={{ color:B.green }}>{req.website}</a></div>}
+                    {req.notes       && <div style={{ fontSize:12, fontFamily:sans, color:B.textSoft, fontStyle:'italic' }}>Note: "{req.notes}"</div>}
+                  </div>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+                    <button onClick={() => applyUpdate(req)}
+                      style={{ background:B.green, color:'#fff', border:'none', borderRadius:10, padding:'10px 0', fontWeight:700, fontSize:13, cursor:'pointer', fontFamily:sans }}>
+                      ✅ Apply Update
+                    </button>
+                    <button onClick={() => rejectUpdate(req)}
+                      style={{ background:B.white, color:'#c00', border:'1px solid #fca5a5', borderRadius:10, padding:'10px 0', fontWeight:700, fontSize:13, cursor:'pointer', fontFamily:sans }}>
+                      ❌ Reject
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
     </div>
   )
 }

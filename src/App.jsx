@@ -137,18 +137,18 @@ export default function App() {
         <Routes>
           <Route path="/"            element={user ? <Discover /> : <Landing />} />
           <Route path="/discover"    element={<Discover />} />
-          <Route path="/feed"        element={<Feed />} />
-          <Route path="/rankings"    element={<Rankings />} />
-          <Route path="/map"         element={<MapPage />} />
+          <Route path="/feed"        element={<ProtectedRoute><Feed /></ProtectedRoute>} />
+          <Route path="/rankings"    element={<ProtectedRoute><Rankings /></ProtectedRoute>} />
+          <Route path="/map"         element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
           <Route path="/auth"        element={<Auth />} />
           <Route path="/course/:id"  element={<CourseDetail />} />
-          <Route path="/submit"      element={<SubmitCourse />} />
+          <Route path="/submit"      element={<ProtectedRoute><SubmitCourse /></ProtectedRoute>} />
           <Route path="/onboarding"  element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
           <Route path="/log"         element={<ProtectedRoute><LogCourse /></ProtectedRoute>} />
           <Route path="/profile"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/admin"       element={<Admin />} />
           <Route path="/auth/confirm" element={<AuthConfirm />} />
-          <Route path="/golfer/:userId" element={<PublicProfile />} />
+          <Route path="/golfer/:userId" element={<ProtectedRoute><PublicProfile /></ProtectedRoute>} />
         </Routes>
       </div>
 

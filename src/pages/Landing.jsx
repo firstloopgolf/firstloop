@@ -38,7 +38,7 @@ export default function Landing() {
           <div>
             <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(196,150,58,0.12)', border:`1px solid rgba(196,150,58,0.25)`, borderRadius:999, padding:'6px 16px', marginBottom:24 }}>
               <span style={{ fontSize:13 }}>⛳</span>
-              <span style={{ color:B.gold, fontSize:12, fontWeight:700, fontFamily:sans, letterSpacing:'0.05em' }}>2,900+ COURSES · 9 STATES · GROWING WEEKLY</span>
+              <span style={{ color:B.gold, fontSize:12, fontWeight:700, fontFamily:sans, letterSpacing:'0.05em' }}>9,000+ COURSES · ALL 50 STATES · GROWING WEEKLY</span>
             </div>
             <h1 style={{ color:B.cream, fontSize:'clamp(36px,4vw,58px)', fontWeight:900, fontFamily:serif, lineHeight:1.1, margin:'0 0 20px', letterSpacing:'-0.02em' }}>
               Rate Every Round.<br/>

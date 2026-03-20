@@ -7,6 +7,7 @@ import { Avatar, RatingChip, RatingRow, NatBadge, StatBadge, TabBar } from '../c
 import { useCourse } from '../hooks/useCourses.js'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
 import FindFriends from '../components/FindFriends.jsx'
+import CourseUpdateModal from '../components/CourseUpdateModal.jsx'
 import RoundComments from '../components/RoundComments.jsx'
 
 export default function CourseDetail() {
@@ -21,7 +22,8 @@ export default function CourseDetail() {
   const [loadingRounds, setLoadingRounds] = useState(true)
   const [shareRound, setShareRound]         = useState(null)
   const [players, setPlayers]               = useState([])
-  const [showFindFriends, setShowFindFriends] = useState(false)
+  const [showFindFriends, setShowFindFriends]   = useState(false)
+  const [showUpdateModal, setShowUpdateModal]   = useState(false)
   const [followTarget, setFollowTarget]       = useState(null)
   const [wantToPlay,    setWantToPlay]         = useState(false)
   const [wantLoading,   setWantLoading]         = useState(false)
@@ -317,16 +319,38 @@ export default function CourseDetail() {
       )}
 
       {showFindFriends && <FindFriends onClose={() => setShowFindFriends(false)}/>}
+      {showUpdateModal && course && <CourseUpdateModal course={course} onClose={() => setShowUpdateModal(false)}/>}
 
       {tab==='about' && (
         <div style={{ background:B.white, borderRadius:16, padding:24, border:`1px solid ${B.border}` }}>
           <h3 style={{ margin:'0 0 16px', color:B.textNavy, fontFamily:serif, fontSize:18 }}>Course Details</h3>
-          {[['📍 Location',course.location],['🏴 State',course.state],['⛳ Par',course.par],['⛳ Holes',course.holes||18],['💰 Price Range',course.price],['🏆 National Rank',`#${course.natRank}`],[`📍 ${course.state} Rank`,`#${course.stRank}`]].map(([k,v]) => (
+          {[
+            ['📍 Location', course.location],
+            ['🏴 State', course.state],
+            ['⛳ Par', course.par],
+            ['⛳ Holes', course.holes || 18],
+            ['💰 Price Range', course.price],
+            ['🏆 National Rank', course.natRank < 999 ? `#${course.natRank}` : null],
+            [`📍 ${course.state} Rank`, course.stRank < 999 ? `#${course.stRank}` : null],
+          ].filter(([,v]) => v).map(([k,v]) => (
             <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'11px 0', borderBottom:`1px solid ${B.feedBg}` }}>
               <span style={{ fontSize:13, color:B.textMid, fontFamily:sans }}>{k}</span>
               <span style={{ fontSize:13, fontWeight:700, color:B.textNavy, fontFamily:sans }}>{v}</span>
             </div>
           ))}
+          {course.website && (
+            <div style={{ display:'flex', justifyContent:'space-between', padding:'11px 0', borderBottom:`1px solid ${B.feedBg}` }}>
+              <span style={{ fontSize:13, color:B.textMid, fontFamily:sans }}>🔗 Website</span>
+              <a href={course.website} target="_blank" rel="noopener noreferrer"
+                style={{ fontSize:13, fontWeight:700, color:B.green, fontFamily:sans, textDecoration:'none' }}>
+                Visit Site →
+              </a>
+            </div>
+          )}
+          <button onClick={() => setShowUpdateModal(true)}
+            style={{ width:'100%', marginTop:16, background:B.feedBg, color:B.textMid, border:`1px solid ${B.border}`, borderRadius:10, padding:'10px 0', fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:sans }}>
+            ✏️ Suggest a correction
+          </button>
         </div>
       )}
     </div>
