@@ -49,7 +49,7 @@ export default function Rankings() {
           <div style={{ fontSize:11, fontWeight:600, color:B.textSoft, fontFamily:sans, marginBottom:8, textTransform:'uppercase', letterSpacing:'0.06em' }}>Select State</div>
           <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
             {allStates.map(s => (
-              <button key={s} onClick={() => setSelectedState(s)} style={{ padding:'5px 13px', borderRadius:999, border:`1.5px solid ${state===s ? B.gold:B.border}`, background:state===s ? B.goldPale:'#fff', color:state===s ? B.navy:B.textMid, fontWeight:700, cursor:'pointer', fontSize:12, fontFamily:sans, transition:'all 0.12s' }}>{s}</button>
+              <button key={s} onClick={() => setSelectedState(s)} style={{ padding:'5px 13px', borderRadius:999, border:`1.5px solid ${selectedState===s ? B.gold:B.border}`, background:selectedState===s ? B.goldPale:'#fff', color:selectedState===s ? B.navy:B.textMid, fontWeight:700, cursor:'pointer', fontSize:12, fontFamily:sans, transition:'all 0.12s' }}>{s}</button>
             ))}
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function Rankings() {
 
           {tab==='state' && (
             <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-              {(st.length ? st : nat.slice(0,5)).map((c,i) => (
+              {(state.length ? state : nat.slice(0,5)).map((c,i) => (
                 <div key={c.id} onClick={() => navigate(`/course/${c.id}`)} style={{ background:B.white, borderRadius:12, padding:'12px 15px', cursor:'pointer', border:`1px solid ${i===0 ? B.gold:B.border}`, display:'flex', alignItems:'center', gap:12, transition:'all 0.15s' }}
                   onMouseEnter={e => e.currentTarget.style.boxShadow='0 4px 16px rgba(27,48,84,0.08)'}
                   onMouseLeave={e => e.currentTarget.style.boxShadow='none'}>
