@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase.js'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '../contexts/ThemeContext.jsx'
 import { PageBanner } from '../components/UI.jsx'
@@ -25,6 +26,49 @@ export default function Rankings() {
   const { courses, loading } = useCourses()
   const [tab, setTab]     = useState('national')
   const [selectedState, setSelectedState] = useState("NY");
+  const [stateCourses,  setStateCourses]  = useState([])
+  const [stateLoading,  setStateLoading]  = useState(false)
+  const [allDbStates,   setAllDbStates]   = useState([])
+
+// Load all states that have courses in the DB
+  useEffect(() => {
+    supabase
+      .from('courses')
+      .select('state')
+      .not('state', 'is', null)
+      .then(({ data }) => {
+        const states = [...new Set((data || []).map(c => c.state).filter(Boolean))].sort()
+        setAllDbStates(states)
+      })
+  }, [])
+
+    // Load courses for selected state whenever state or tab changes
+    useEffect(() => {
+      if (tab !== 'state') return
+      setStateLoading(true)
+      supabase
+        .from('courses')
+        .select('*')
+        .eq('state', selectedState)
+        .order('rating', { ascending: false })
+        .limit(20)
+        .then(({ data }) => {
+          setStateCourses((data || []).map(c => ({
+            id:       c.id,
+            name:     c.name,
+            location: c.location,
+            state:    c.state,
+            rating:   c.rating || 0,
+            reviews:  c.review_count || 0,
+            natRank:  c.nat_rank || 999,
+            stRank:   c.st_rank || 999,
+            icon:     c.icon || '⛳',
+            bg:       c.bg_color || '#1a2e1a',
+            isLive:   c.is_live_ranked || false,
+          })))
+          setStateLoading(false)
+        })
+    }, [tab, selectedState])
 
   const nat = courses
     .filter(c => c.natRank <= 100)
@@ -46,15 +90,19 @@ export default function Rankings() {
 
       {tab==='state' && (
         <div style={{ marginBottom:16 }}>
-          <div style={{ fontSize:11, fontWeight:600, color:B.textSoft, fontFamily:sans, marginBottom:8, textTransform:'uppercase', letterSpacing:'0.06em' }}>Select State</div>
-          <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
-            {allStates.map(s => (
-              <button key={s} onClick={() => setSelectedState(s)} style={{ padding:'5px 13px', borderRadius:999, border:`1.5px solid ${selectedState===s ? B.gold:B.border}`, background:selectedState===s ? B.goldPale:'#fff', color:selectedState===s ? B.navy:B.textMid, fontWeight:700, cursor:'pointer', fontSize:12, fontFamily:sans, transition:'all 0.12s' }}>{s}</button>
+          <label style={{ fontSize:11, fontWeight:600, color:B.textSoft, fontFamily:sans, display:'block', marginBottom:8, textTransform:'uppercase', letterSpacing:'0.06em' }}>Select State</label>
+          <select
+            value={selectedState}
+            onChange={e => setSelectedState(e.target.value)}
+            style={{ width:'100%', padding:'11px 14px', borderRadius:10, border:`1px solid ${B.border}`, fontSize:14, fontFamily:sans, color:B.textNavy, background:B.white, outline:'none', cursor:'pointer' }}
+          >
+            {(allDbStates.length ? allDbStates : allStates).map(s => (
+              <option key={s} value={s}>{s}</option>
             ))}
-          </div>
+          </select>
         </div>
       )}
-
+      
       {loading ? (
         <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
           {[...Array(5)].map((_,i) => (
@@ -97,7 +145,15 @@ export default function Rankings() {
 
           {tab==='state' && (
             <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-              {(state.length ? state : nat.slice(0,5)).map((c,i) => (
+              {stateLoading ? (
+                [...Array(5)].map((_,i) => (
+                  <div key={i} style={{ background:B.white, borderRadius:12, height:64, border:`1px solid ${B.border}`, opacity:0.5 }}/>
+                ))
+              ) : stateCourses.length === 0 ? (
+                <div style={{ textAlign:'center', padding:'40px 0', color:B.textSoft, fontFamily:sans }}>
+                  No courses found for {selectedState}
+                </div>
+              ) : stateCourses.map((c,i) => (
                 <div key={c.id} onClick={() => navigate(`/course/${c.id}`)} style={{ background:B.white, borderRadius:12, padding:'12px 15px', cursor:'pointer', border:`1px solid ${i===0 ? B.gold:B.border}`, display:'flex', alignItems:'center', gap:12, transition:'all 0.15s' }}
                   onMouseEnter={e => e.currentTarget.style.boxShadow='0 4px 16px rgba(27,48,84,0.08)'}
                   onMouseLeave={e => e.currentTarget.style.boxShadow='none'}>
