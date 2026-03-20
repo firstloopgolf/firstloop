@@ -6,6 +6,7 @@ import { useTheme } from '../contexts/ThemeContext.jsx'
 import { Avatar, RatingChip, RatingRow, NatBadge, StatBadge, TabBar } from '../components/UI.jsx'
 import { useCourse } from '../hooks/useCourses.js'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
+import FindFriends from '../components/FindFriends.jsx'
 import RoundComments from '../components/RoundComments.jsx'
 
 export default function CourseDetail() {
@@ -18,9 +19,12 @@ export default function CourseDetail() {
   const [tab, setTab]             = useState('feed')
   const [rounds, setRounds]       = useState([])
   const [loadingRounds, setLoadingRounds] = useState(true)
-  const [shareRound, setShareRound] = useState(null)
+  const [shareRound, setShareRound]         = useState(null)
+  const [players, setPlayers]               = useState([])
+  const [showFindFriends, setShowFindFriends] = useState(false)
+  const [followTarget, setFollowTarget]       = useState(null)
 
-  useEffect(() => { if (id) fetchRounds() }, [id])
+  useEffect(() => { if (id) { fetchRounds(); fetchPlayers() } }, [id])
 
     // Update page title and meta for SEO
     useEffect(() => {
@@ -46,6 +50,22 @@ export default function CourseDetail() {
       .limit(20)
     setRounds(data || [])
     setLoadingRounds(false)
+  }
+
+  async function fetchPlayers() {
+    const { data } = await supabase
+      .from('rounds')
+      .select('user_id, profiles(id, username, full_name)')
+      .eq('course_id', id)
+      .limit(12)
+    // Deduplicate by user_id
+    const seen = new Set()
+    const unique = (data || []).filter(r => {
+      if (!r.profiles || seen.has(r.user_id)) return false
+      seen.add(r.user_id)
+      return true
+    })
+    setPlayers(unique.map(r => r.profiles))
   }
 
   if (courseLoading) return (
@@ -228,6 +248,43 @@ export default function CourseDetail() {
           </div>
         </div>
       )}
+
+      {/* Golfers who've played this */}
+      {players.length > 0 && (
+        <div style={{ background: B.white, borderRadius: 16, padding: '18px 20px', border: `1px solid ${B.border}`, marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: B.textNavy, fontFamily: serif }}>
+              Golfers who've played this
+            </div>
+            <button onClick={() => setShowFindFriends(true)}
+              style={{ background: 'none', border: `1px solid ${B.border}`, borderRadius: 20, padding: '5px 12px', fontSize: 12, color: B.textMid, cursor: 'pointer', fontFamily: sans, fontWeight: 600 }}>
+              Follow them
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {players.map(p => {
+              const initials = (p.full_name || p.username || 'G').slice(0, 2).toUpperCase()
+              const avatarColors = ['#2d5a27','#1a3d5a','#5a3a1a','#3a1a5a','#1a5a3a']
+              const color = avatarColors[(p.username?.charCodeAt(0) || 0) % avatarColors.length]
+              return (
+                <div key={p.id}
+                  onClick={() => navigate(`/golfer/${p.id}`)}
+                  title={p.full_name || p.username}
+                  style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 700, fontFamily: sans }}>
+                    {initials}
+                  </div>
+                  <div style={{ fontSize: 10, color: B.textSoft, fontFamily: sans, maxWidth: 48, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    @{p.username || 'golfer'}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {showFindFriends && <FindFriends onClose={() => setShowFindFriends(false)}/>}
 
       {tab==='about' && (
         <div style={{ background:B.white, borderRadius:16, padding:24, border:`1px solid ${B.border}` }}>

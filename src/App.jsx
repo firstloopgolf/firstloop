@@ -16,6 +16,7 @@ import SubmitCourse from './pages/SubmitCourse.jsx'
 import Onboarding   from './pages/Onboarding.jsx'
 import LogCourse    from './pages/LogCourse.jsx'
 import Admin        from './pages/Admin.jsx'
+import PublicProfile from './pages/PublicProfile.jsx'
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabase.js'
 import AuthConfirm from './pages/AuthConfirm.jsx'
@@ -147,6 +148,7 @@ export default function App() {
           <Route path="/profile"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/admin"       element={<Admin />} />
           <Route path="/auth/confirm" element={<AuthConfirm />} />
+          <Route path="/golfer/:userId" element={<PublicProfile />} />
         </Routes>
       </div>
 

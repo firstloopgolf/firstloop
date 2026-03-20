@@ -8,6 +8,7 @@ import { Pill } from '../components/UI.jsx'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
 import GolfPassport from '../components/GolfPassport.jsx'
 import CourseSuggestions from '../components/CourseSuggestions.jsx'
+import FindFriends from '../components/FindFriends.jsx'
 
 export default function Profile() {
   const { B, serif, sans } = useTheme()
@@ -20,7 +21,10 @@ export default function Profile() {
   const [saveMsg, setSaveMsg]       = useState('')
   const [shareRound, setShareRound] = useState(null)
   const [shareCourse, setShareCourse] = useState(null)
-  const [showPassport, setShowPassport] = useState(false)
+  const [showPassport, setShowPassport]     = useState(false)
+  const [showFindFriends, setShowFindFriends] = useState(false)
+  const [followerCount, setFollowerCount]     = useState(0)
+  const [followingCount, setFollowingCount]   = useState(0)
 
   // Edit form state
   const [fullName,       setFullName]       = useState('')
@@ -32,7 +36,7 @@ export default function Profile() {
 
   const STATES = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']
 
-  useEffect(() => { fetchRounds() }, [user])
+  useEffect(() => { fetchRounds(); fetchFollowCounts() }, [user])
 
   useEffect(() => {
     if (profile) {
@@ -55,6 +59,16 @@ export default function Profile() {
       .order('elo_score', { ascending: false })   // ← ORDER BY ELO (best first)
     setRounds(data || [])
     setLoading(false)
+  }
+
+  async function fetchFollowCounts() {
+    if (!user) return
+    const [{ data: followers }, { data: followingList }] = await Promise.all([
+      supabase.from('follows').select('follower_id').eq('following_id', user.id),
+      supabase.from('follows').select('following_id').eq('follower_id', user.id),
+    ])
+    setFollowerCount(followers?.length || 0)
+    setFollowingCount(followingList?.length || 0)
   }
 
   async function saveProfile(e) {
@@ -109,6 +123,7 @@ export default function Profile() {
           onClose={() => { setShareRound(null); setShareCourse(null) }}
         />
       )}
+      {showFindFriends && <FindFriends onClose={() => setShowFindFriends(false)}/>}
       {showPassport && (
         <GolfPassport
           profile={profile}
@@ -140,13 +155,13 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Stats grid — now shows Courses, Avg Score, States, #1 Course */}
+        {/* Stats grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
           {[
-            [rounds.length, 'Courses'],
-            [avgScore,      'Avg Score'],
-            [states.length, 'States'],
-            [topCourse ? `#1` : '--', 'Top Ranked'],
+            [rounds.length,   'Courses'],
+            [followerCount,   'Followers'],
+            [followingCount,  'Following'],
+            [states.length,   'States'],
           ].map(([n, l]) => (
             <div key={l} style={{ background: 'rgba(240,232,213,0.08)', borderRadius: 11, padding: '11px 8px', textAlign: 'center' }}>
               <div style={{ color: B.gold, fontSize: 18, fontWeight: 900, fontFamily: serif }}>{n}</div>
@@ -155,10 +170,16 @@ export default function Profile() {
           ))}
         </div>
 
-        <button onClick={() => setShowPassport(true)}
-          style={{ width: '100%', marginTop: 14, background: 'rgba(201,168,76,0.12)', color: B.gold, border: '1px solid rgba(201,168,76,0.25)', borderRadius: 11, padding: '10px 0', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: serif, letterSpacing: '0.02em' }}>
-          🗂 Share my Golf Passport
-        </button>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 14 }}>
+          <button onClick={() => setShowPassport(true)}
+            style={{ background: 'rgba(201,168,76,0.12)', color: B.gold, border: '1px solid rgba(201,168,76,0.25)', borderRadius: 11, padding: '10px 0', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: serif }}>
+            🗂 Golf Passport
+          </button>
+          <button onClick={() => setShowFindFriends(true)}
+            style={{ background: 'rgba(201,168,76,0.12)', color: B.gold, border: '1px solid rgba(201,168,76,0.25)', borderRadius: 11, padding: '10px 0', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: serif }}>
+            👥 Find Golfers
+          </button>
+        </div>
       </div>
 
       {/* ── Badges ── */}

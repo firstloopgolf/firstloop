@@ -6,6 +6,7 @@ import { useTheme } from '../contexts/ThemeContext.jsx'
 import { Avatar, NatBadge, PageBanner } from '../components/UI.jsx'
 import ShareRoundModal from '../components/ShareRoundModal.jsx'
 import RoundComments from '../components/RoundComments.jsx'
+import FindFriends from '../components/FindFriends.jsx'
 
 // Convert stored rating (2–10) to emoji
 function ratingEmoji(v) {
@@ -78,7 +79,8 @@ export default function Feed() {
   const [likeCounts,  setLikeCounts]  = useState({})
   const [likeUsers,   setLikeUsers]   = useState({})
   const [showLikers,  setShowLikers]  = useState({})
-  const [shareRound, setShareRound] = useState(null)  // ← was missing, caused bug
+  const [shareRound, setShareRound]         = useState(null)
+  const [showFindFriends, setShowFindFriends] = useState(false)  // ← was missing, caused bug
   const [shareCourse,setShareCourse]= useState(null)
   const [feedTab, setFeedTab] = useState('community') // 'community' | 'following'
 
@@ -173,6 +175,7 @@ export default function Feed() {
   return (
     <div>
       {/* Share modal */}
+      {showFindFriends && <FindFriends onClose={() => setShowFindFriends(false)}/>}
       {shareRound && (
         <ShareRoundModal
           round={shareRound}
@@ -193,12 +196,20 @@ export default function Feed() {
         ))}
       </div>
 
-      <button
-        onClick={() => user ? navigate('/log') : navigate('/auth')}
-        style={{ width: '100%', background: B.gold, color: B.navy, border: 'none', borderRadius: 12, padding: '13px 0', fontWeight: 800, fontSize: 15, cursor: 'pointer', marginBottom: 16, fontFamily: serif }}
-      >
-        + Log a New Round
-      </button>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, marginBottom: 16 }}>
+        <button
+          onClick={() => user ? navigate('/log') : navigate('/auth')}
+          style={{ background: B.gold, color: B.navy, border: 'none', borderRadius: 12, padding: '13px 0', fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: serif }}
+        >
+          + Log a New Round
+        </button>
+        <button
+          onClick={() => setShowFindFriends(true)}
+          style={{ background: B.white, color: B.textNavy, border: `1px solid ${B.border}`, borderRadius: 12, padding: '13px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' }}
+        >
+          👥 Find
+        </button>
+      </div>
 
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -210,11 +221,17 @@ export default function Feed() {
         <div style={{ textAlign: 'center', padding: '60px 20px', background: B.white, borderRadius: 16, border: `1px solid ${B.border}` }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>{feedTab === 'following' ? '👥' : '⛳'}</div>
           <div style={{ fontSize: 18, fontWeight: 700, color: B.textNavy, fontFamily: serif, marginBottom: 8 }}>
-            {feedTab === 'following' ? 'No rounds from people you follow' : 'No rounds yet'}
+            {feedTab === 'following' ? 'Your following feed is empty' : 'No rounds yet'}
           </div>
           <div style={{ fontSize: 13, color: B.textSoft, fontFamily: sans, marginBottom: 20 }}>
             {feedTab === 'following' ? 'Follow other golfers to see their rounds here' : 'Be the first to log a round'}
           </div>
+          {feedTab === 'following' && (
+            <button onClick={() => setShowFindFriends(true)}
+              style={{ background: B.green, color: '#fff', border: 'none', borderRadius: 12, padding: '11px 28px', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: serif }}>
+              👥 Find Golfers to Follow
+            </button>
+          )}
           <button onClick={() => navigate('/log')}
             style={{ background: B.gold, color: B.navy, border: 'none', borderRadius: 12, padding: '11px 24px', fontWeight: 700, cursor: 'pointer', fontFamily: serif }}>
             Log a Round
